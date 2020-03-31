@@ -16,13 +16,15 @@ While the letter layout might seem random at first, it's in fact a modification 
 ![Type 82 Key Layout](./images/keymap.png)
 
 ## BOM
-- 2 x [nRF52840 Express](https://www.adafruit.com/product/4481)	$35.90
-- 2 x [LiPoly Backpack](https://www.adafruit.com/product/2124)	$9.90
-- 2 x [2000mAh Lithium Battery](https://www.adafruit.com/product/2011)	$25.00
-- 2 x [Qi Wireless Charging Receiver](https://www.adafruit.com/product/1901)	$29.90
-- 1 x [Mini Rotary Shaft Encoder (lot of 5)](https://www.aliexpress.com/item/32988694062.html?spm=2114.search0302.3.150.2b9053288aErqe&ws_ab_test=searchweb0_0,searchweb201602_0,searchweb201603_0,ppcSwitch_0&algo_pvid=b8f704f6-06c1-4fb3-bbef-edd8e0cd6a59&algo_expid=b8f704f6-06c1-4fb3-bbef-edd8e0cd6a59-21)	$7.80 + tax & shipping
-- 2 x [2 Axis Navigation Switch](https://www.digikey.com/product-detail/en/e-switch/JS5208/EG4561-ND/1739634)	$5.52
-- 1 x [Zilent 78g Switches (lot of 10)](https://zealpc.net/collections/switches/products/zilents)	$12.00
+| Quanitiy | Item | Price |
+| --- | --- | --- |
+| 2 | [nRF52840 Express](https://www.adafruit.com/product/4481)	| $35.90 |
+| 2 | [LiPoly Backpack](https://www.adafruit.com/product/2124) | $9.90 |
+| 2 | [2000mAh Lithium Battery](https://www.adafruit.com/product/2011) | $25.00 |
+| 2 | [Qi Wireless Charging Receiver](https://www.adafruit.com/product/1901) | $29.90 |
+| 1 | [Mini Rotary Shaft Encoder (lot of 5)](https://www.aliexpress.com/item/32988694062.html?spm=2114.search0302.3.150.2b9053288aErqe&ws_ab_test=searchweb0_0,searchweb201602_0,searchweb201603_0,ppcSwitch_0&algo_pvid=b8f704f6-06c1-4fb3-bbef-edd8e0cd6a59&algo_expid=b8f704f6-06c1-4fb3-bbef-edd8e0cd6a59-21) | $7.80 |
+| 2 | [2 Axis Navigation Switch](https://www.digikey.com/product-detail/en/e-switch/JS5208/EG4561-ND/1739634) | $5.52 |
+| 1 | [Zilent 78g Switches (lot of 10)](https://zealpc.net/collections/switches/products/zilents) | $12.00 |
 
 ## TODO
 - [x] Build initial models
