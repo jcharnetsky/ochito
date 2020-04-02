@@ -7,13 +7,29 @@ The render below demonstrates what the right hand side of the keyboard will look
 ![Right Half](./images/right-hand.png)
 
 ## Keymap
-Below is an initial keymap for the Type 82. Multiple colors can be seen demonstrating different "layers". Using [QMK](https://qmk.fm/) keyboard firmware, all standard keys can be typed by utilizing QMK's "layer" feature. On a normal keyboard, one can think of the Shift key representing a separate layer on a keyboard. Normally there is not a single key that one can press to type a capital `A`; instead, one must first hold the Shift key to access the capital letters "layer" and then press the `a` key to type a capital `A`. 
+Below is an initial keymap for the Type 82. Multiple colors can be seen demonstrating different "layers". Using [QMK](https://qmk.fm/) keyboard firmware, all standard keys can be typed by utilizing QMK's "layer" feature. On a normal keyboard, one can think of pressing the Shift key as a layer change. Normally there is not a single key that one can press to type a capital `A`; instead, one must first hold the Shift key to access the capital letter "layer" and then press the `a` key to type a capital `A`. 
 
-The Type 82 uses the concept of layers heavily. Each color represents two layers accessible by moving the directional pad in one of the cardinal directions. For example, the red layer on the left half of the image below is accessed by first holding the dpad on the left half of the keyboard in the left direction. As can be seen, while holding the dpad to the left, this makes the keys under the right fingers act as left click, middle click, right click, and printscreen. Further, the right hand dpad will move the mouse in the direction it is pressed. To reach the red layer on the right half of the image, the right hand dpad must be held in the left direction and combined with another key. In this manner all standard keys can be typed as seen in the example keymap.
+The Type 82 uses the concept of layers to an extreme. Each color represents two layers accessible by moving the directional pad in one of the cardinal directions. For example, the red layer on the left half of the image below is accessed by first holding the dpad on the left half of the keyboard in the left direction. As can be seen, while holding the dpad to the left, this makes the keys under the right fingers act as left click, middle click, right click, and printscreen. Further, the right hand dpad will move the mouse cursor in the direction it is pressed. To reach the red layer on the right half of the image, the right hand dpad must be held in the left direction and combined with another key. In this manner all standard keys can be typed as seen in the example keymap.
 
-While the letter layout might seem random at first, it's in fact a modification of the dvorak keyboard layout. While the standard QWERTY keyboard layout is standard, it is only so due to tradition. Popularized by typewriters as a way to minimize jamming of the arms which would imprint letters on paper, QWERTY has remained the standard far past the standardization of digital input. The dvorak layout, while failing to replace QWERTY as the standard, offers a more comfortable typing experience while placing more frequently used keys on the home row as well as promoting a "flow" of typing between the left and right hands. Vowels can be found on the left side while most commonly used consonants can be found on the right. Further information on the dvorak keyboard layout can be found [here](https://en.wikipedia.org/wiki/Dvorak_keyboard_layout).
+While the letter layout might seem random at first, it's in fact a modification of the [dvorak](https://en.wikipedia.org/wiki/Dvorak_keyboard_layout) keyboard layout. While the QWERTY keyboard layout is standard, it is only so due to tradition. Popularized by typewriters as a way to minimize jamming of the arms which would imprint letters on paper, QWERTY has remained the default far past the standardization of digital input. The dvorak layout, while failing to replace QWERTY, offers a more comfortable typing experience while placing more frequently used keys on the home row as well as promoting a flow of typing between the left and right hands. Vowels can be found on the left side while most commonly used consonants can be found on the right.
 
 ![Type 82 Key Layout](./images/keymap.png)
+
+## Components
+### Rotary Encoders
+As stated, rotary encoders will be used on both halves in order to provide scrolling and volume control among other features. QMK supports rotary encoders which can provide additional functionality that would otherwise be bothersome on a normal keyboard. For example while page up and down can be used to scroll, a scroll wheel is much more precise.  
+
+### Bluetooth ProMicro 
+To make the keyboard totally wireless, bluetooth enabled microcontrollers will be used. Normally, the microcontrollers used in hobbyist keyboards only allow for split keyboards ([(example)](https://kinesis-ergo.com/split-keyboards/) by connecting one half (the "master") to the computer and connecting the other half (the "slave")  to the master via a cable, usually a [trrs cable](https://en.wikipedia.org/wiki/Phone_connector_(audio)). By using a microcontroller with the nRF52840 module, a bluetooth connection is established between the master and the slave as well as a separate connection between the master and the computer. This is preferred to having two connections to the computer and none between the halves as this would render chording impossible.
+
+### LiPoly Backpack
+This addon allows the microcontroller to charge an attached lithium battery.
+
+### Battery
+Pretty self explanatory.
+
+### Wireless Charging Receiver
+Qi enabled wireless charging receivers will be used to allow wireless charging of either half. In this manner, the keyboard will be truly wireless and require no ports on the exterior.
 
 ## BOM
 | Quanitiy | Item | Price |
@@ -28,7 +44,7 @@ While the letter layout might seem random at first, it's in fact a modification 
 
 ## TODO
 - [x] Build initial models
-- [ ] Add rotary encoder cutout to keyboard model
+- [x] Add rotary encoder cutout to keyboard model
 - [ ] Finalize locking mechanism for keyboard scaffold
 - [ ] Get dimensions for electronics
 - [ ] Add internal mounts for electronics

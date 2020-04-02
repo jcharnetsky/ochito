@@ -44,7 +44,7 @@ encoderHeight = fingerWidth - 2*keycapHeight;
 encoderDiameter = keycapWidth/3*2;
 
 module switchCutout() {
-    cube([switchHeightInner,switchHeightInner,40]);
+    cube([switchHeightInner,switchHeightInner,thickness+4]);
 }
 module switchCutouts() {
     // Pointer finger cutout
@@ -52,21 +52,25 @@ module switchCutouts() {
     ,pointerDepth,fingerHeight - thickness - 0.2])
         rotate([-5, 0, 0])
             switchCutout();
+    
     // Middle finger cutout
     translate([((fingerWidth - 2 * thickness)/4 * 1) + ((fingerWidth - 2 * thickness)/8 - switchHeightInner/2) + thickness
     ,middleDepth,fingerHeight - thickness - 0.2])
         rotate([-5, 0, 0])
             switchCutout();
+    
     // Ring finger cutout
     translate([((fingerWidth - 2 * thickness)/4 * 2) + ((fingerWidth - 2 * thickness)/8 - switchHeightInner/2) + thickness
     ,ringDepth,fingerHeight - thickness - 0.2])
         rotate([-5, 0, 0])
             switchCutout();
+    
     // Pinky finger cutout
     translate([((fingerWidth - 2 * thickness)/4 * 3) + ((fingerWidth - 2 * thickness)/8 - switchHeightInner/2) + thickness
     ,pinkyDepth,fingerHeight - thickness - 0.2])
         rotate([-5, 0, 0])
             switchCutout();
+            
     // Thumb cutout
 translate([-((thumbWidth - fingerWidth)/2 + 0.3),-(1/2 * switchHeightInner), fingerHeight/2 + switchHeightInner/2])
         rotate([0,90,0])
@@ -84,21 +88,21 @@ module usbCutout() {
 }
 module screwMounts() {
     difference() {
-    translate([fingerWidth - 2/3 * screwMountRadius, fingerDepth * 0.4, 5])
+    translate([fingerWidth - 2/3 * screwMountRadius, fingerDepth * 0.4, 0])
         cylinder(h = screwMountHeight, r = screwMountRadius);
-    translate([fingerWidth - 0.01, fingerDepth * 0.3, 4])
+    translate([fingerWidth - 0.01, fingerDepth * 0.3, -1])
         cube([10,10,12]);
     }
     difference() {
-        translate([2/3 * screwMountRadius, fingerDepth * 0.4, 5])
+        translate([2/3 * screwMountRadius, fingerDepth * 0.4, 0])
             cylinder(h = screwMountHeight, r = screwMountRadius);
-        translate([-9.99, fingerDepth * 0.3, 4])
+        translate([-9.99, fingerDepth * 0.3, -1])
             cube([10,10,12]);
     }
     difference() {
-        translate([1/2 * fingerWidth, fingerDepth - screwMountRadius * 2/3, 5])
+        translate([1/2 * fingerWidth, fingerDepth - screwMountRadius * 2/3, 0])
             cylinder(h = screwMountHeight, r = screwMountRadius);
-        translate([1/2 * fingerWidth - 5, fingerDepth - 0.01, 4])
+        translate([1/2 * fingerWidth - 5, fingerDepth - 0.01, -1])
             cube([10,10,12]);
     }   
 }
@@ -107,6 +111,7 @@ module fingerBase() {
         difference() {
             // Base
             cube([fingerWidth, fingerDepth, fingerHeight]);
+            
             // Left Angles
             translate([0, fingerDepth - leftAngleOffset * 2.5, -0.2])
                 rotate([0, 0, leftAngle1])
@@ -114,6 +119,7 @@ module fingerBase() {
             translate([0, fingerDepth - leftAngleOffset, -0.2])
                 rotate([0,0,leftAngle2])
                     cube([50, 10, fingerHeight + 0.4]);
+            
             // Right angles
             translate([fingerWidth - rightAngleOffset, fingerDepth,-0.2])
                 rotate([0, 0, rightAngle1])
@@ -122,8 +128,6 @@ module fingerBase() {
                 rotate([0, 0, rightAngle2])
                     cube([50, 10, fingerHeight + 0.4]);
         }
-        
-        
     }
 }
 module thumbBase() {
@@ -149,17 +153,24 @@ module fullBase() {
 }
 module hollowBase() {
     difference() {
-        fullBase();
-        translate([thickness, 0.1, thickness])
-            scale(v = [(thumbWidth - 2*thickness)/thumbWidth, (fingerDepth + thumbRadius - 2*thickness)/(fingerDepth + thumbRadius), (fingerHeight + keycapWidth/2 - 2*thickness)/(fingerHeight + keycapWidth/2)]) {
+        union() {
+            difference() {
                 fullBase();
+                translate([thickness, 0.1, thickness])
+                    scale(v = [(thumbWidth - 2*thickness)/thumbWidth, (fingerDepth + thumbRadius - 2*thickness)/(fingerDepth + thumbRadius), (fingerHeight + keycapWidth/2 - 2*thickness)/(fingerHeight + keycapWidth/2)]) {
+                        fullBase();
+                    }
             }
+            encoderCutout();
+        }
+        translate([keycapWidth/2 - 0.1, keycapWidth/2, fingerHeight + keycapWidth/4])
+            rotate([0, 90, 0])
+                cylinder(h = encoderHeight+0.2, d = encoderDiameter + tolerance*2);
     }
-    encoderCutout();
 }
 module lid() {
     intersection() {
-        hollowBody();
+        hollowBase();
         translate([1/2 * thickness,1/2*thickness, -(fingerHeight - thickness*2)])
             scale(v = [(fingerWidth - thickness)/fingerWidth, (fingerDepth - thickness)/fingerDepth, (fingerHeight - thickness)/fingerHeight]) {
                 fingerBase();
@@ -243,13 +254,15 @@ module encoderEnds(){
         encoderEnd();
 }
 module encoderCutout() {
-    translate([keycapWidth/2, keycapWidth/2, fingerHeight + keycapWidth/4])
+    difference() {
+    translate([keycapWidth/2, keycapWidth/2, fingerHeight + keycapWidth/4 - thickness])
         rotate([0, 90, 0])
-            difference() {
-                cylinder(h = encoderHeight, d = encoderDiameter + tolerance*2);
-translate([0, 0, encoderHeight/2])
-    cube([encoderDiameter/2, encoderDiameter + 0.1, encoderHeight + 0.1], center = true);
-            }
+            cylinder(h = encoderHeight, d = encoderDiameter + thickness*2);
+    translate([keycapWidth/4, keycapWidth/2 - encoderDiameter - thickness*2, fingerHeight + keycapWidth/4])
+        rotate([-5, 0, 0])
+        cube([encoderHeight*2, encoderDiameter*2, encoderDiameter+ thickness*2]); 
+    }
+ 
 }
 
 
@@ -263,12 +276,10 @@ color("#3f667d") {
         difference() {
             hollowBase();
             translate([1/2 * thickness,1/2*thickness, -(fingerHeight - thickness*2)])
-            scale(v = [(fingerWidth - thickness)/fingerWidth, (fingerDepth - thickness)/fingerDepth, (fingerHeight - thickness)/fingerHeight]) {
-                fingerBase();
+                scale(v = [(fingerWidth - thickness)/fingerWidth, (fingerDepth - thickness)/fingerDepth, (fingerHeight - thickness)/fingerHeight]) {
+                    fingerBase();
             }
             switchCutouts();
-            trrsCutout();
-            usbCutout(); 
         }
         screwMounts();
     }
