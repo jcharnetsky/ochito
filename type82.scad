@@ -170,8 +170,8 @@ module hollowBase() {
                         fullBase();
                     }
             }
-            // Space for encoder
-            encoderCutout();
+            // Space for encoder knob
+            encoderKnobCutout();
             difference() {
                 translate([0, 0, fingerHeight + keycapHeight/2])
                     rotate([-5, 0, 0])
@@ -179,17 +179,18 @@ module hollowBase() {
             }
 
         }
-        // Cutout for encoder ends
-        translate([keycapWidth/2 - encoderWidth*2, keycapWidth/2 - (encoderDepth + tolerance*2)/2, fingerHeight])
-            rotate([-5, 0, 0])
-                cube([encoderWidth*2, encoderDepth + tolerance*2, keycapHeight]);
-        
+        // Divet for encoder knob
         translate([keycapWidth/2 - 0.01, keycapWidth/2, fingerHeight + keycapWidth/4])
             rotate([0, 90, 0])
                 cylinder(h = encoderKnobHeight, d = encoderKnobDiameter + tolerance*2);
+        
+        // Encoder cutout
+        translate([keycapWidth/2 - encoderWidth*2, keycapWidth/2 - (encoderDepth + tolerance*2)/2, fingerHeight])
+    rotate([-5, 0, 0])
+            cube([encoderWidth*2, encoderDepth + tolerance*2, keycapHeight]);
     }
     proMicroStandoff();
-
+    encoderStandoff();
 }
 module lid() {
     translate([0, 0, -40])
@@ -280,21 +281,30 @@ module encoderEnds(){
         rotate([0, 0, 180])
             encoderEnd();
 }
-module encoderCutout() {
+module encoderKnobCutout() {
     difference() {
-    translate([keycapWidth/2, keycapWidth/2, fingerHeight + keycapWidth/4 - thickness])
-        rotate([0, 90, 0])
-            cylinder(h = encoderKnobHeight + thickness, d = encoderKnobDiameter + thickness*2);
-    translate([keycapWidth/4, keycapWidth/2 - encoderKnobDiameter - thickness*2, fingerHeight + keycapWidth/4])
-        rotate([-5, 0, 0])
-        cube([encoderKnobHeight*2, encoderKnobDiameter*2, encoderKnobDiameter + thickness*2]); 
+        translate([keycapWidth/2, keycapWidth/2, fingerHeight + keycapWidth/4 - thickness])
+            rotate([0, 90, 0])
+                cylinder(h = encoderKnobHeight + thickness, d = encoderKnobDiameter + thickness*2);
+        translate([keycapWidth/4, keycapWidth/2 - encoderKnobDiameter - thickness*2, fingerHeight + keycapWidth/4])
+            rotate([-5, 0, 0])
+            cube([encoderKnobHeight*2, encoderKnobDiameter*2, encoderKnobDiameter + thickness*2]); 
     }
  
 }
 module encoder() {
     translate([keycapWidth/2 - encoderWidth + 0.1, keycapWidth/2 - encoderDepth/2, fingerHeight])
-    rotate([-5, 0, 0])
         cube([encoderWidth, encoderDepth, encoderHeight]);
+}
+module encoderStandoff() {
+    intersection() {
+        translate([keycapWidth/2 - encoderWidth, thickness/2, fingerHeight - encoderHeight])
+            cube([encoderWidth, encoderKnobDiameter + thickness*2, encoderHeight]);
+        
+        translate([keycapWidth/2 - encoderWidth, keycapWidth/2, fingerHeight + keycapWidth/4 - thickness])
+                rotate([0, 90, 0])
+                    cylinder(h = encoderWidth, d = encoderKnobDiameter + thickness*2);
+    }
 }
 module battery() {
     translate([fingerWidth/2 - batteryWidth/2, 0, -42.3])
@@ -338,7 +348,7 @@ module batteryStandoff() {
 }
 
 //keycaps();
-lid();
+//lid();
 battery();
 proMicro();
 encoder();
