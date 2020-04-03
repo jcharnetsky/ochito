@@ -40,8 +40,28 @@ screwMountHeight = 8;
 keycapWidth = 18;
 keycapHeight = 9.4;
 
-encoderHeight = fingerWidth - 2*keycapHeight;
-encoderDiameter = keycapWidth/3*2;
+encoderKnobHeight = fingerWidth - 2*keycapHeight;
+encoderKnobDiameter = keycapWidth/3*2;
+
+encoderWidth = 2.1;
+encoderDepth = 6.25;
+encoderHeight = 8.6;
+
+batteryWidth = 60;
+batteryDepth = 36;
+batteryHeight = 7;
+
+batteryStandoffWidth = batteryWidth + tolerance*2;
+batteryStandoffWidth = batteryWidth + tolerance*2;
+batteryStandoffWidth = batteryWidth + tolerance*2;
+
+proMicroWidth = 36;
+proMicroDepth = 17.6;
+proMicroHeight = 5.3;
+
+proMicroStandoffWidth = proMicroWidth + 4;
+proMicroStandoffDepth = proMicroHeight + 10;
+proMicroStandoffHeight = proMicroDepth + 10;
 
 module switchCutout() {
     cube([switchHeightInner,switchHeightInner,thickness+4]);
@@ -77,15 +97,6 @@ translate([-((thumbWidth - fingerWidth)/2 + 0.3),-(1/2 * switchHeightInner), fin
             switchCutout();
 }
 
-module trrsCutout() {
-    translate([thumbWidth - (thumbWidth - fingerWidth)/2 - thickness * 1.19, 0, fingerHeight/2 + trrsRadius/2])
-        rotate([0, 90, 0])
-            cylinder(h = thickness * 1.2, r = trrsRadius);
-}
-module usbCutout() {
-    translate([thumbWidth - (thumbWidth - fingerWidth)/2 - thickness * 1.19,-(1/2 * usbWidth),0])    
-        cube([thickness * 1.2, usbWidth, usbHeight]);
-}
 module screwMounts() {
     difference() {
     translate([fingerWidth - 2/3 * screwMountRadius, fingerDepth * 0.4, 0])
@@ -145,15 +156,13 @@ module fullBase() {
                         cylinder(h = fingerWidth, r = thumbRadius);
             }
             thumbBase();
-            translate([0, 0, fingerHeight + keycapHeight/2])
-            rotate([-5, 0, 0])
-            encoderEnds();
         }
     }
 }
 module hollowBase() {
     difference() {
         union() {
+            // Hollow base
             difference() {
                 fullBase();
                 translate([thickness, 0.1, thickness])
@@ -161,21 +170,39 @@ module hollowBase() {
                         fullBase();
                     }
             }
+            // Space for encoder
             encoderCutout();
+            difference() {
+                translate([0, 0, fingerHeight + keycapHeight/2])
+                    rotate([-5, 0, 0])
+                        encoderEnds();
+            }
+
         }
-        translate([keycapWidth/2 - 0.1, keycapWidth/2, fingerHeight + keycapWidth/4])
+        // Cutout for encoder ends
+        translate([keycapWidth/2 - encoderWidth*2, keycapWidth/2 - (encoderDepth + tolerance*2)/2, fingerHeight])
+            rotate([-5, 0, 0])
+                cube([encoderWidth*2, encoderDepth + tolerance*2, keycapHeight]);
+        
+        translate([keycapWidth/2 - 0.01, keycapWidth/2, fingerHeight + keycapWidth/4])
             rotate([0, 90, 0])
-                cylinder(h = encoderHeight+0.2, d = encoderDiameter + tolerance*2);
+                cylinder(h = encoderKnobHeight, d = encoderKnobDiameter + tolerance*2);
     }
+    proMicroStandoff();
+
 }
 module lid() {
-    intersection() {
-        hollowBase();
-        translate([1/2 * thickness,1/2*thickness, -(fingerHeight - thickness*2)])
-            scale(v = [(fingerWidth - thickness)/fingerWidth, (fingerDepth - thickness)/fingerDepth, (fingerHeight - thickness)/fingerHeight]) {
-                fingerBase();
+    translate([0, 0, -40])
+        color("#3f667d") {
+            intersection() {
+                hollowBase();
+                translate([1/2 * thickness,1/2*thickness, -(fingerHeight - thickness*2)])
+                    scale(v = [(fingerWidth - thickness)/fingerWidth, (fingerDepth - thickness)/fingerDepth, (fingerHeight - thickness)/fingerHeight]) {
+                        fingerBase();
+                    }
             }
-    }
+            batteryStandoff();
+        }
 }
 module keycap() {
     difference() {
@@ -203,10 +230,10 @@ module keycap() {
 module dpad() {
     cylinder(h = keycapHeight/2, r = keycapWidth/1.5);
 }
-module encoder() {
+module encoderKnob() {
     translate([keycapWidth/2, keycapWidth/2, fingerHeight + keycapWidth/4])
         rotate([0, 90, 0])
-            knurled_cyl(encoderHeight, encoderDiameter, 3, 3, 0.5, 2, 0);
+            knurled_cyl(encoderKnobHeight, encoderKnobDiameter, 3, 3, 0.5, 2, 0);
 }
 module keycaps() {
     color("#d4666b") {
@@ -235,40 +262,86 @@ module keycaps() {
                 dpad();
     }
     color("#dacfcc") {
-        encoder();   
+        encoderKnob();   
        
     }
 }
 module encoderEnd() {
     difference() {
             keycap();
-            translate([keycapWidth/2, 0, -0.1])
-                cube([keycapWidth, keycapWidth, 10]);
+            translate([keycapWidth/2, 0, 0])
+                cube([keycapWidth*1.2, keycapWidth*1.2, 20]);
         }
     }
 
 module encoderEnds(){
     encoderEnd();
-    translate([keycapWidth + encoderHeight, keycapWidth, 0])
-    rotate([0, 0, 180])
-        encoderEnd();
+    translate([keycapWidth + encoderKnobHeight, keycapWidth, 0])
+        rotate([0, 0, 180])
+            encoderEnd();
 }
 module encoderCutout() {
     difference() {
     translate([keycapWidth/2, keycapWidth/2, fingerHeight + keycapWidth/4 - thickness])
         rotate([0, 90, 0])
-            cylinder(h = encoderHeight, d = encoderDiameter + thickness*2);
-    translate([keycapWidth/4, keycapWidth/2 - encoderDiameter - thickness*2, fingerHeight + keycapWidth/4])
+            cylinder(h = encoderKnobHeight + thickness, d = encoderKnobDiameter + thickness*2);
+    translate([keycapWidth/4, keycapWidth/2 - encoderKnobDiameter - thickness*2, fingerHeight + keycapWidth/4])
         rotate([-5, 0, 0])
-        cube([encoderHeight*2, encoderDiameter*2, encoderDiameter+ thickness*2]); 
+        cube([encoderKnobHeight*2, encoderKnobDiameter*2, encoderKnobDiameter + thickness*2]); 
     }
  
 }
-
-
+module encoder() {
+    translate([keycapWidth/2 - encoderWidth + 0.1, keycapWidth/2 - encoderDepth/2, fingerHeight])
+    rotate([-5, 0, 0])
+        cube([encoderWidth, encoderDepth, encoderHeight]);
+}
+module battery() {
+    translate([fingerWidth/2 - batteryWidth/2, 0, -42.3])
+        rotate([5, 0, 0])
+            cube([batteryWidth, batteryDepth, batteryHeight]);
+}
+module proMicro() {
+    translate([fingerWidth/2 - proMicroWidth/2, -thumbRadius/2, 0])
+        cube([proMicroWidth, proMicroHeight, proMicroDepth]);
+}
+module proMicroStandoff() {
+    difference() {
+        intersection() {
+            translate([fingerWidth/2 - proMicroStandoffWidth/2, -thumbRadius, -5])
+                cube([proMicroStandoffWidth, proMicroStandoffDepth,proMicroStandoffHeight]);
+            thumbBase();
+        }
+        translate([fingerWidth/2 - proMicroStandoffWidth/2 - 0.01, -proMicroHeight + 0.02, -tolerance])
+            cube([proMicroWidth + 12, proMicroHeight + 2*tolerance, proMicroDepth + 2*tolerance]);
+    }
+}
+module batteryStandoff() {
+    difference() {
+        translate([fingerWidth/2 - batteryWidth/2 - 5, batteryDepth/4 - 5, -2])
+            rotate([5, 0, 0])
+            cube([5, 10, batteryHeight + 2.5]);
+      
+        translate([fingerWidth/2 - batteryWidth/2 - tolerance, 0, -2.3])
+            rotate([5, 0, 0])
+                cube([batteryStandoffWidth, batteryDepth + tolerance, batteryHeight + tolerance]);
+    }    
+    difference() {
+    translate([fingerWidth/2 + batteryWidth/2, batteryDepth/4 - 5, -2])
+        rotate([5, 0, 0])
+        cube([5, 10, batteryHeight + 2.5]);
+        
+        translate([fingerWidth/2 - batteryWidth/2 - tolerance, 0, -2.3])
+            rotate([5, 0, 0])
+                cube([batteryWidth + tolerance*2, batteryDepth + tolerance, batteryHeight + tolerance]);
+    }
+}
 
 //keycaps();
-//lid();
+lid();
+battery();
+proMicro();
+encoder();
 
 color("#3f667d") {
     // Hollow body with cutouts & screw mounts
