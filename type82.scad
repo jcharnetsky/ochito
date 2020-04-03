@@ -70,6 +70,10 @@ chargingChipWidth = 11.5;
 chargingChipDepth = 36;
 chargingChipHeight = 0.3;
 
+bearingDOut = 6;
+bearingDIn = 3;
+bearingW = 2.5;
+
 module switchCutout() {
     cube([switchHeightInner,switchHeightInner,thickness+4]);
 }
@@ -194,7 +198,13 @@ module hollowBase() {
         // Encoder cutout
         translate([keycapWidth/2 - encoderWidth*2, keycapWidth/2 - (encoderDepth + tolerance*2)/2, fingerHeight])
             cube([encoderWidth*2, encoderDepth + tolerance*2, keycapHeight]);
+        
+        
     }
+    // Bearing standoff
+    translate([encoderKnobHeight + keycapWidth/2 - bearingW, keycapWidth/2, fingerHeight + keycapWidth/4])
+        rotate([0, 90, 0])
+            cylinder(h = bearingW + 0.2, d = bearingDIn - tolerance);
     proMicroStandoff();
     encoderStandoff();
 }
@@ -227,7 +237,11 @@ module dpad() {
 module encoderKnob() {
     translate([keycapWidth/2, keycapWidth/2, fingerHeight + keycapWidth/4])
         rotate([0, 90, 0])
+        difference() {
             knurled_cyl(encoderKnobHeight, encoderKnobDiameter, 3, 3, 0.5, 2, 0);
+            translate([0, 0, encoderKnobHeight - bearingW + 0.1])
+            cylinder(h = bearingW + 0.2, d = bearingDOut + tolerance);
+        }
 }
 module keycaps() {
     color("#d4666b") {
@@ -368,13 +382,25 @@ module chargingReceiver() {
         }
     }
 }
+module ballBearing() {
+    color("#c0c0c0") {
+        translate([encoderKnobHeight + keycapWidth/2 - bearingW, keycapWidth/2, fingerHeight + keycapWidth/4])
+        rotate([0, 90, 0])
+        difference() {
+            cylinder(h = bearingW, d = bearingDOut);
+            translate([0, 0, -0.1])
+            cylinder(h = bearingW + 0.2, d = bearingDIn);
+        }
+    }
+}
 
 //keycaps();
 lid();
 battery();
+chargingReceiver();
 proMicro();
 encoder();
-chargingReceiver();
+ballBearing();
 
 color("#3f667d") {
     // Hollow body with cutouts & screw mounts
@@ -390,4 +416,3 @@ color("#3f667d") {
         screwMounts();
     }
 }
-
