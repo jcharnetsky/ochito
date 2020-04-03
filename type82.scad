@@ -63,6 +63,13 @@ proMicroStandoffWidth = proMicroWidth + 4;
 proMicroStandoffDepth = proMicroHeight + 10;
 proMicroStandoffHeight = proMicroDepth + 10;
 
+chargingReceiverWidth = 48;
+chargingReceiverDepth = 32;
+chargingReceiverHeight = 0.5;
+chargingChipWidth = 11.5;
+chargingChipDepth = 36;
+chargingChipHeight = 0.3;
+
 module switchCutout() {
     cube([switchHeightInner,switchHeightInner,thickness+4]);
 }
@@ -186,7 +193,6 @@ module hollowBase() {
         
         // Encoder cutout
         translate([keycapWidth/2 - encoderWidth*2, keycapWidth/2 - (encoderDepth + tolerance*2)/2, fingerHeight])
-    rotate([-5, 0, 0])
             cube([encoderWidth*2, encoderDepth + tolerance*2, keycapHeight]);
     }
     proMicroStandoff();
@@ -293,8 +299,10 @@ module encoderKnobCutout() {
  
 }
 module encoder() {
-    translate([keycapWidth/2 - encoderWidth + 0.1, keycapWidth/2 - encoderDepth/2, fingerHeight])
-        cube([encoderWidth, encoderDepth, encoderHeight]);
+    color("#c0c0c0") {
+        translate([keycapWidth/2 - encoderWidth + 0.1, keycapWidth/2 - encoderDepth/2, fingerHeight])
+            cube([encoderWidth, encoderDepth, encoderHeight]);
+    }
 }
 module encoderStandoff() {
     intersection() {
@@ -306,14 +314,11 @@ module encoderStandoff() {
                     cylinder(h = encoderWidth, d = encoderKnobDiameter + thickness*2);
     }
 }
-module battery() {
-    translate([fingerWidth/2 - batteryWidth/2, 0, -42.3])
-        rotate([5, 0, 0])
-            cube([batteryWidth, batteryDepth, batteryHeight]);
-}
 module proMicro() {
-    translate([fingerWidth/2 - proMicroWidth/2, -thumbRadius/2, 0])
-        cube([proMicroWidth, proMicroHeight, proMicroDepth]);
+    color("#000080") {
+        translate([fingerWidth/2 - proMicroWidth/2, -thumbRadius/2, 0])
+            cube([proMicroWidth, proMicroHeight, proMicroDepth]);
+    }
 }
 module proMicroStandoff() {
     difference() {
@@ -324,6 +329,13 @@ module proMicroStandoff() {
         }
         translate([fingerWidth/2 - proMicroStandoffWidth/2 - 0.01, -proMicroHeight + 0.02, -tolerance])
             cube([proMicroWidth + 12, proMicroHeight + 2*tolerance, proMicroDepth + 2*tolerance]);
+    }
+}
+module battery() {
+    color("#000000") {
+        translate([fingerWidth/2 - batteryWidth/2, 0, -42.3])
+            rotate([5, 0, 0])
+                cube([batteryWidth, batteryDepth, batteryHeight]);
     }
 }
 module batteryStandoff() {
@@ -346,12 +358,25 @@ module batteryStandoff() {
                 cube([batteryWidth + tolerance*2, batteryDepth + tolerance, batteryHeight + tolerance]);
     }
 }
+module chargingReceiver() {
+    color("#b87333") {
+        translate([fingerWidth/2 - (chargingReceiverWidth + chargingChipWidth)/2, 0, -42.6])
+        union() {
+            rotate([5, 0, 0])
+            translate([chargingChipWidth, 0, 0])
+                cube([chargingReceiverWidth, chargingReceiverDepth, chargingReceiverHeight]);
+            rotate([5, 0, 0])
+                cube([chargingChipWidth, chargingChipDepth, chargingChipHeight]);
+        }
+    }
+}
 
 //keycaps();
 //lid();
 battery();
 proMicro();
 encoder();
+chargingReceiver();
 
 color("#3f667d") {
     // Hollow body with cutouts & screw mounts
