@@ -51,9 +51,9 @@ batteryWidth = 60;
 batteryDepth = 36;
 batteryHeight = 7;
 
-batteryStandoffWidth = batteryWidth + tolerance*2;
-batteryStandoffWidth = batteryWidth + tolerance*2;
-batteryStandoffWidth = batteryWidth + tolerance*2;
+batteryStandoffWidth = 5;
+batteryStandoffDepth = 10;
+batteryStandoffHeight = batteryHeight + 2.5;
 
 proMicroWidth = 36;
 proMicroDepth = 17.6;
@@ -198,19 +198,6 @@ module hollowBase() {
     proMicroStandoff();
     encoderStandoff();
 }
-module lid() {
-    translate([0, 0, -40])
-        color("#3f667d") {
-            intersection() {
-                hollowBase();
-                translate([1/2 * thickness,1/2*thickness, -(fingerHeight - thickness*2)])
-                    scale(v = [(fingerWidth - thickness)/fingerWidth, (fingerDepth - thickness)/fingerDepth, (fingerHeight - thickness)/fingerHeight]) {
-                        fingerBase();
-                    }
-            }
-            batteryStandoff();
-        }
-}
 module keycap() {
     difference() {
         cube([keycapWidth, keycapWidth, keycapHeight]);
@@ -331,6 +318,19 @@ module proMicroStandoff() {
             cube([proMicroWidth + 12, proMicroHeight + 2*tolerance, proMicroDepth + 2*tolerance]);
     }
 }
+module lid() {
+    translate([0, 0, -40])
+        color("#3f667d") {
+            intersection() {
+                hollowBase();
+                translate([1/2 * thickness,1/2*thickness, -(fingerHeight - thickness*2)])
+                    scale(v = [(fingerWidth - thickness)/fingerWidth, (fingerDepth - thickness)/fingerDepth, (fingerHeight - thickness)/fingerHeight]) {
+                        fingerBase();
+                    }
+            }
+            batteryStandoff();
+        }
+}
 module battery() {
     color("#000000") {
         translate([fingerWidth/2 - batteryWidth/2, 0, -42.3])
@@ -339,24 +339,22 @@ module battery() {
     }
 }
 module batteryStandoff() {
-    difference() {
-        translate([fingerWidth/2 - batteryWidth/2 - 5, batteryDepth/4 - 5, -2])
-            rotate([5, 0, 0])
-            cube([5, 10, batteryHeight + 2.5]);
-      
-        translate([fingerWidth/2 - batteryWidth/2 - tolerance, 0, -2.3])
-            rotate([5, 0, 0])
-                cube([batteryStandoffWidth, batteryDepth + tolerance, batteryHeight + tolerance]);
-    }    
-    difference() {
-    translate([fingerWidth/2 + batteryWidth/2, batteryDepth/4 - 5, -2])
+    translate([fingerWidth/2 - batteryWidth/2 - 5, batteryDepth/4 - 5, -batteryStandoffHeight/4])
         rotate([5, 0, 0])
-        cube([5, 10, batteryHeight + 2.5]);
-        
-        translate([fingerWidth/2 - batteryWidth/2 - tolerance, 0, -2.3])
-            rotate([5, 0, 0])
-                cube([batteryWidth + tolerance*2, batteryDepth + tolerance, batteryHeight + tolerance]);
-    }
+            union() {
+                difference() {
+                    cube([batteryStandoffWidth, batteryStandoffDepth, batteryStandoffHeight]);
+                    translate([batteryStandoffWidth - tolerance, -tolerance, 0])
+                        cube([batteryWidth + 2*tolerance, batteryDepth + tolerance, batteryHeight + 2*tolerance]);
+                }
+                difference() {
+                    translate([batteryWidth + batteryStandoffWidth, 0, 0])
+                    cube([batteryStandoffWidth, batteryStandoffDepth, batteryStandoffHeight]);
+                                        translate([batteryStandoffWidth - tolerance, -tolerance, 0])
+                    cube([batteryWidth + 2*tolerance, batteryDepth + tolerance, batteryHeight + 2*tolerance]);
+                }
+            }
+
 }
 module chargingReceiver() {
     color("#b87333") {
@@ -372,7 +370,7 @@ module chargingReceiver() {
 }
 
 //keycaps();
-//lid();
+lid();
 battery();
 proMicro();
 encoder();
