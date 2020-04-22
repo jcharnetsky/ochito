@@ -1,6 +1,11 @@
 include <knurledFinishLib_v2.scad>;
 
 $fn=100;
+
+keycapColor = "#5d432c";
+keyboardColor = "#242424";
+highlightKeycapColor = "#3ba8a8";
+
 thickness = 2;
 tolerance = 0.5;
 
@@ -263,7 +268,7 @@ module encoderKnob() {
 }
 // All keycaps and encoder knob (for visualization only)
 module keycaps() {
-    color("#d4666b") {
+    color(keycapColor) {
         rotate([-5, 0, 0])
             translate([((fingerW - 2 * thickness)/8 - keycapW/2) + thickness
         , pointerDe - keycapW/5, fingerH + thickness*1.4])
@@ -283,14 +288,13 @@ module keycaps() {
             translate([((fingerW - 2 * thickness)/4 * 3) + ((fingerW - 2 * thickness)/8 - keycapW/2) + thickness
         , pinkyDe - keycapW/5, fingerH + thickness*1.4])
                 keycap();
-        
+    }
+    color(highlightKeycapColor) {
+        encoderKnob();   
+       
          translate([-(thumbW - fingerW)/2 - keycapH/2 - thickness*0.1, 0, thumbR/2 + keycapH/4])
             rotate([0, 90, 0])
                 dpad();
-    }
-    color("#dacfcc") {
-        encoderKnob();   
-       
     }
 }
 // Extrusion to cap encoder knob, hold in place
@@ -359,7 +363,7 @@ module proMicroStandoff() {
 // Bottom lid of keyboard
 module lid() {
     translate([0, 0, -40])
-        color("#3f667d") {
+        color(keyboardColor) {
             intersection() {
                 hollowBase();
                 translate([1/2 * thickness,1/2*thickness, -(fingerH - thickness*2)])
@@ -424,14 +428,14 @@ module ballBearing() {
 }
 
 //keycaps();
-lid();
-battery();
-chargingReceiver();
+//lid();
+//battery();
+//chargingReceiver();
 proMicro();
 encoder();
 ballBearing();
 
-color("#3f667d") {
+color(keyboardColor) {
     // Hollow body with cutouts & screw mounts
     union() {
         difference() {
