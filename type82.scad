@@ -46,15 +46,6 @@ screwMountH = 8;
 keycapW = 18;
 keycapH = 9.4;
 
-// Knurled encoder knob
-knobH = fingerW - 2*keycapH;
-knobDi = keycapW/3*2;
-
-// Encoder component (for visualization only)
-encoderW = 2.1;
-encoderDe = 6.25;
-encoderH = 8.6;
-
 // Rechargable battery (for visualization only)
 batteryW = 60;
 batteryDe = 36;
@@ -201,32 +192,31 @@ module hollowBase() {
                         fullBase();
                     }
             }
-            // Space for encoder knob
-            encoderKnobCutout();
-            difference() {
-                translate([0, 0, fingerH + keycapH/2])
-                    rotate([-5, 0, 0])
-                        encoderEnds();
-            }
 
         }
-        // Divet for encoder knob
-        translate([keycapW/2 - 0.01, keycapW/2, fingerH + keycapW/4])
-            rotate([0, 90, 0])
-                cylinder(h = knobH, d = knobDi + tolerance*2);
-        
-        // Encoder cutout
-        translate([keycapW/2 - encoderW*2, keycapW/2 - (encoderDe + tolerance*2)/2, fingerH])
-            cube([encoderW*2, encoderDe + tolerance*2, keycapH]);
-        
-        
     }
-    // Bearing standoff
-    translate([knobH + keycapW/2 - bearingW, keycapW/2, fingerH + keycapW/4])
-        rotate([0, 90, 0])
-            cylinder(h = bearingW + 0.2, d = bearingDIn - tolerance);
-    proMicroStandoff();
-    encoderStandoff();
+    // Hand attachment
+    translate([fingerW - 10, -thumbR + 5, thumbR + fingerH/2 - 5])
+      cube([10, 20, 20]);
+    translate([0, -thumbR + 5, thumbR + fingerH/2 - 5])
+      cube([10, 20, 20]);
+
+    translate([fingerW - 10, -thumbR + 5, thumbR + fingerH/2 - 5 + 20 - sin(10)*10])
+    rotate([0, -10, 0])
+      cube([10, 20, 10]);
+    translate([0, -thumbR + 5, thumbR + fingerH/2 - 5 + 20])
+    rotate([0, 10, 0])
+      cube([10, 20, 10]);
+
+    translate([fingerW - 10 - sin(10)*7, -thumbR + 5, thumbR + fingerH/2 - 5 + 30 - sin(20)*10])
+    rotate([0, -20, 0])
+      cube([10, 20, 10]);
+    translate([sin(10)*10, -thumbR + 5, thumbR + fingerH/2 - 5 + 30])
+    rotate([0, 20, 0])
+      cube([10, 20, 10]);
+
+    translate([5, -thumbR + 5, thumbR + 35])
+    cube([fingerW - 10, 20, 10]);
 }
 // Single keycap (for visualization only)
 module keycap() {
@@ -256,17 +246,7 @@ module keycap() {
 module dpad() {
     cylinder(h = keycapH/2, r = keycapW/1.5);
 }
-// Knurled knob to allow scrolling, volume adjust, etc.
-module encoderKnob() {
-    translate([keycapW/2, keycapW/2, fingerH + keycapW/4])
-        rotate([0, 90, 0])
-        difference() {
-            knurled_cyl(knobH, knobDi, 3, 3, 0.5, 2, 0);
-            translate([0, 0, knobH - bearingW + 0.1])
-            cylinder(h = bearingW + 0.2, d = bearingDOut + tolerance);
-        }
-}
-// All keycaps and encoder knob (for visualization only)
+// All keycaps (for visualization only)
 module keycaps() {
     color(keycapColor) {
         rotate([-5, 0, 0])
@@ -290,55 +270,9 @@ module keycaps() {
                 keycap();
     }
     color(highlightKeycapColor) {
-        encoderKnob();   
-       
          translate([-(thumbW - fingerW)/2 - keycapH/2 - thickness*0.1, 0, thumbR/2 + keycapH/4])
             rotate([0, 90, 0])
                 dpad();
-    }
-}
-// Extrusion to cap encoder knob, hold in place
-module encoderEnd() {
-	difference() {
-		keycap();
-			translate([keycapW/2, 0, 0])
-				cube([keycapW*1.2, keycapW*1.2, 20]);
-	}
-}
-// Two extrusions, one mirrored to cap encoder knob
-module encoderEnds(){
-    encoderEnd();
-    translate([keycapW + knobH, keycapW, 0])
-        rotate([0, 0, 180])
-            encoderEnd();
-}
-// Cutout to allow space for encoder knob
-module encoderKnobCutout() {
-    difference() {
-        translate([keycapW/2, keycapW/2, fingerH + keycapW/4 - thickness])
-            rotate([0, 90, 0])
-                cylinder(h = knobH + thickness, d = knobDi + thickness*2);
-        translate([keycapW/4, keycapW/2 - knobDi - thickness*2, fingerH + keycapW/4])
-            rotate([-5, 0, 0])
-            cube([knobH*2, knobDi*2, knobDi + thickness*2]); 
-    }
- 
-}
-// Encoder electical component
-module encoder() {
-    color("#c0c0c0") {
-        translate([keycapW/2 - encoderW + 0.1, keycapW/2 - encoderDe/2, fingerH])
-            cube([encoderW, encoderDe, encoderH]);
-    }
-}
-module encoderStandoff() {
-    intersection() {
-        translate([keycapW/2 - encoderW, thickness/2, fingerH - encoderH])
-            cube([encoderW, knobDi + thickness*2, encoderH]);
-        
-        translate([keycapW/2 - encoderW, keycapW/2, fingerH + keycapW/4 - thickness])
-                rotate([0, 90, 0])
-                    cylinder(h = encoderW, d = knobDi + thickness*2);
     }
 }
 // Micro-controller (for visualization only)
@@ -427,13 +361,11 @@ module ballBearing() {
     }
 }
 
-//keycaps();
+keycaps();
 //lid();
 //battery();
 //chargingReceiver();
 proMicro();
-encoder();
-ballBearing();
 
 color(keyboardColor) {
     // Hollow body with cutouts & screw mounts
