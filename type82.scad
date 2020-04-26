@@ -73,10 +73,12 @@ chargerChipW = 11.5;
 chargerChipDe = 36;
 chargerChipH = 0.3;
 
-// Encoder knob bearing (for visualization only)
-bearingDOut = 6;
-bearingDIn = 3;
-bearingW = 2.5;
+// Screw standoffs to connect lid to case
+screwD = 2;
+screwStandoffH = 10;
+screwStandoffD = screwD + 2;
+counterSinkH = 1;
+screwHeadD = 4;
 
 // Single keycap (for visualization only)
 module keycap() {
@@ -179,16 +181,16 @@ module switchCutouts() {
 		cube([switchHIn, switchHIn, thickness + 2]);
 	translate([2*keycapSpacing + keycapW/2 - switchHIn/2 + keycapW, middleDe + keycapSpacing, fingerH - thickness - 1])
 		cube([switchHIn, switchHIn, thickness + 2]);
-	translate([2*keycapSpacing + keycapW/2 - switchHIn/2 + 2*keycapW, ringDe + keycapSpacing, fingerH - thickness - 1])
+	translate([3*keycapSpacing + keycapW/2 - switchHIn/2 + 2*keycapW, ringDe + keycapSpacing, fingerH - thickness - 1])
 		cube([switchHIn, switchHIn, thickness + 2]);
-	translate([2*keycapSpacing + keycapW/2 - switchHIn/2 + 3*keycapW, pinkyDe + keycapSpacing, fingerH - thickness - 1])
+	translate([4*keycapSpacing + keycapW/2 - switchHIn/2 + 3*keycapW, pinkyDe + keycapSpacing, fingerH - thickness - 1])
 		cube([switchHIn, switchHIn, thickness + 2]);
 
 	translate([-thickness + sin(thumbAngle)*thickness, -sin(thumbAngle)*thickness, fingerH/2 - switchHIn/2])
 					rotate([0, 0, thumbAngle -5])
 		cube([thickness + 2, switchHIn, switchHIn]);
 }
-module case(wall) {
+module case(wall = 0) {
 	difference() {
 	hull() {
 		// Palm rest
@@ -233,6 +235,18 @@ module case(wall) {
 		cube([keycapW + keycapSpacing + 2*wall, fingerDe, keycapH]);
 	}
 }
+module screws(height, diameter) {
+		translate([fingerW/2 - screwStandoffD/2, -handR + screwStandoffD*7/8, 0])
+			cylinder(h = height, d = diameter);
+		translate([fingerW - thickness - 0.01, 0, 0])
+			cylinder(h = height, d = diameter);
+		translate([thickness, pointerDe + keycapW - thickness, 0])
+			cylinder(h = height, d = diameter);
+		translate([4.6*thickness, -fingerW/4, 0])
+			cylinder(h = height, d = diameter);
+		translate([fingerW - thickness - 0.01, pinkyDe + keycapW - thickness, 0])
+			cylinder(h = height, d = diameter);
+}
 module lid() {
 	battery();
 	chargingReceiver();
@@ -240,27 +254,45 @@ module lid() {
 
 	translate([0, 0, -lidDistance])
 	color(keyboardColor) {
-		intersection() {
-			case(0);
-			translate([-thumbDe, -handR, -handR + lidH])
-				cube([thumbDe + fingerW, fingerDe + handR, handR]);
+		difference() {
+			intersection() {
+				case(0);
+				translate([-thumbDe, -handR, -handR + lidH])
+					cube([thumbDe + fingerW, fingerDe + handR, handR]);
+			}
+			translate([0, 0, -(lidH + 0.01)])
+				screws(screwStandoffH, screwD);
+			translate([0, 0, -0.01])
+				screws(counterSinkH, screwHeadD);
+
 		}
-	translate([fingerW/2 - proMicroStandoffW/2, -(proMicroStandoffDe + (batteryStandoffDe - batteryDe)/2), lidH])
+		translate([fingerW/2 - proMicroStandoffW/2, -(proMicroStandoffDe + (batteryStandoffDe - batteryDe)/2), lidH])
 			proMicroStandoff();
-	translate([fingerW/2 - batteryStandoffW/2, -(batteryStandoffDe - batteryDe)/2, lidH])
-		batteryStandoff();
+		translate([fingerW/2 - batteryStandoffW/2, -(batteryStandoffDe - batteryDe)/2, lidH])
+			batteryStandoff();
 	}
 }
 
 keycaps();
 lid();
 
-// Hollowed out case
 color(keyboardColor) {
+	// Hollow out screw standoffs
 	difference() {
-		case(0);
-		case(thickness);
-		switchCutouts();
+		// Add screw standoffs
+		union() {
+			// Hollowed out case with switch cutouts
+			difference() {
+				case();
+				case(thickness);
+				switchCutouts();
+			}
+
+			// Screw standoffs
+			screws(screwStandoffH, screwStandoffD);
+		}
+
+		translate([0, 0, -2])
+		screws(screwStandoffH, screwD);
 	}
 }
-
