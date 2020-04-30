@@ -7,7 +7,7 @@ keyboardColor = "#242424";
 highlightKeycapColor = "#3ba8a8";
 
 thickness = 2;
-tolerance = 0.5;
+tolerance = 0.2;
 
 // W -> width, De -> Depth, Di -> Diameter, H -> Height, R -> Radius
 
@@ -43,7 +43,7 @@ pinkyDe = 0.43 * fingerDe;
 // Thickness of bottom lid
 lidH = 3;
 // Distance from keyboard to render lid
-lidDistance = 50;
+lidDistance = lidH;
 
 // Rechargable battery (for visualization only)
 batteryW = 60;
@@ -79,6 +79,23 @@ screwStandoffH = 10;
 screwStandoffD = screwD + 2;
 counterSinkH = 1;
 screwHeadD = 4;
+
+// Base to attach keyboard to chair
+baseH = 15;
+baseIndent = 4;
+
+// Quick release mechanism
+quickReleaseArmDi = 7.14 + tolerance;
+quickReleaseArmH = 10;
+quickReleaseButtonDi = quickReleaseArmDi;
+quickReleaseButtonHeadDi = quickReleaseButtonDi - 2;
+quickReleaseButtonH = 10;
+quickReleaseSpringH = 12.7;
+
+// Channel to hold keyboard in place on base
+rightSideChannelDe = 0.5*fingerW;
+leftSideChannelDe = 0.6*fingerW;
+sideChannelW = thickness/2 + tolerance;
 
 // Single keycap (for visualization only)
 module keycap() {
@@ -238,8 +255,6 @@ module case(wall = 0) {
 module screws(height, diameter) {
 		translate([fingerW/2 - screwStandoffD/2, -handR + screwStandoffD*7/8, 0])
 			cylinder(h = height, d = diameter);
-		translate([fingerW - thickness - 0.01, 0, 0])
-			cylinder(h = height, d = diameter);
 		translate([thickness, pointerDe + keycapW - thickness, 0])
 			cylinder(h = height, d = diameter);
 		translate([4.6*thickness, -fingerW/4, 0])
@@ -265,6 +280,12 @@ module lid() {
 			translate([0, 0, -0.01])
 				screws(counterSinkH, screwHeadD);
 
+			// Channel cutouts
+			translate([sin(thumbAngle - 5)*leftSideChannelDe - 8.1, -leftSideChannelDe + pinkyDe, lidH/2 - sideChannelW/2])
+				rotate([0, 0, thumbAngle - 5])
+					cube([sideChannelW, leftSideChannelDe, sideChannelW]);
+			translate([fingerW - sideChannelW + 0.05, -rightSideChannelDe + pinkyDe, lidH/2 - sideChannelW/2])
+				cube([sideChannelW, rightSideChannelDe, sideChannelW]);
 		}
 		translate([fingerW/2 - proMicroStandoffW/2, -(proMicroStandoffDe + (batteryStandoffDe - batteryDe)/2), lidH])
 			proMicroStandoff();
@@ -272,27 +293,68 @@ module lid() {
 			batteryStandoff();
 	}
 }
-
-keycaps();
-lid();
-
-color(keyboardColor) {
-	// Hollow out screw standoffs
+module base() {
+	translate([-(fingerW*1.1 - fingerW)/2, -((fingerDe + handR)*1.1 - (fingerDe + handR))/4, -baseH + baseIndent - lidH])
 	difference() {
-		// Add screw standoffs
-		union() {
-			// Hollowed out case with switch cutouts
-			difference() {
-				case();
-				case(thickness);
-				switchCutouts();
+		scale([1.1, 1.1, 1.1])
+			case();
+		translate([-400, -400, baseH])
+			cube([1000, 1000, 1000]);
+
+		// Indent
+		translate([2*(fingerW*1.02 - fingerW), ((fingerDe + handR)*1.02 - (fingerDe + handR)), baseH - baseIndent])
+		scale([1.02, 1.02, 1.02])
+			case();
+
+		// Front opening to slide in case
+		translate([-fingerW/2, fingerDe - 1.5*keycapW, baseH - baseIndent])
+		cube([2*fingerW, 2*(fingerDe + handR), baseIndent + 1]);
+
+		// Quick release channel
+		translate([1.1*fingerW - quickReleaseButtonH - quickReleaseArmH - quickReleaseSpringH - 3, 0, baseH - baseIndent - quickReleaseArmDi/2 - tolerance])
+		rotate([0, 90, 0])
+		cylinder(h = quickReleaseArmH + quickReleaseButtonH + quickReleaseSpringH + 2*tolerance, d = quickReleaseArmDi + tolerance);
+
+		// Top opening to channel
+	translate([1.1*fingerW - quickReleaseButtonH - quickReleaseArmH - 3, -(quickReleaseArmDi/2 + tolerance), baseH - baseIndent - quickReleaseArmDi/2 + 0.1])
+	cube([quickReleaseArmH + 2*tolerance, 2*(quickReleaseArmDi/2 + tolerance), quickReleaseArmDi]);
+
+		// Button hole
+		translate([1.1*fingerW - 3, 0, baseH - baseIndent - quickReleaseArmDi/2 - tolerance])
+		rotate([0, 90, 0])
+		cylinder(h = 4, d = quickReleaseButtonHeadDi + tolerance);
+	}
+translate([-sin(thumbAngle - 17)*leftSideChannelDe + 5.34, -leftSideChannelDe + pinkyDe, -lidDistance + lidH/2 - sideChannelW/2])
+	rotate([0, 0, thumbAngle - 5])
+		cube([2*sideChannelW, leftSideChannelDe, sideChannelW - tolerance]);
+translate([fingerW - sideChannelW + 0.05 + tolerance, -rightSideChannelDe + pinkyDe, -lidDistance + lidH/2 - sideChannelW/2])
+	cube([2*sideChannelW - tolerance, rightSideChannelDe, sideChannelW - tolerance]);
+
+}
+module keyboard() {
+	color(keyboardColor) {
+		// Hollow out screw standoffs
+		difference() {
+			// Add screw standoffs
+			union() {
+				// Hollowed out case with switch cutouts
+				difference() {
+					case();
+					case(thickness);
+					switchCutouts();
+				}
+
+				// Screw standoffs
+				screws(screwStandoffH, screwStandoffD);
 			}
 
-			// Screw standoffs
-			screws(screwStandoffH, screwStandoffD);
+			translate([0, 0, -2])
+			screws(screwStandoffH, screwD);
 		}
-
-		translate([0, 0, -2])
-		screws(screwStandoffH, screwD);
 	}
 }
+
+//keyboard();
+//keycaps();
+//lid();
+base();
