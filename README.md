@@ -1,8 +1,8 @@
-# Type-82
-An ergonomic, split, wireless keyboard featuring 8 keys and 2 dpads
+# Ochito
+An ergonomic, split, wireless keyboard featuring 8 keys and 2 dpads. "Ochito" comes from the small form factor of only 8 keys. The diminutive in spanish is used by adding '-ito' to the end of a word, in this case "ocho" or eight.
 
 ## Physical Layout
-The render below demonstrates what the right hand side of the keyboard will look like. With a single row of keys seen in pink, finger extension as well as lateral movement is kept to a minimum. In theory this would reduce strain as well as the risk of RSI. The cylinder seen in pink in a 5 directional pad allowing for key combinations or "chording" to type all keys on a normal keyboard. Finally, seen in white is a knurled "scroll wheel" which can be used as vertical scroll, volume adjust, screen brightness adjust, etc.
+The render below demonstrates what the right hand side of the keyboard will look like. With a single row of keys seen in brown, finger extension as well as lateral movement is kept to a minimum. In theory this would reduce strain as well as the risk of RSI. The flat cylinder seen in blue is a 5 directional pad allowing for key combinations or "chording" to type all keys on a normal keyboard.
 
 ![Right Half](./images/right-hand.png)
 
@@ -15,36 +15,41 @@ While the letter layout might seem random at first, it's in fact a modification 
 
 ![Type 82 Key Layout](./images/keymap.png)
 
-## Components
-### Rotary Encoders
-As stated, rotary encoders will be used on both halves in order to provide scrolling and volume control among other features. QMK supports rotary encoders which can provide additional functionality that would otherwise be bothersome on a normal keyboard. For example while page up and down can be used to scroll, a scroll wheel is much more precise.  
-
-### Bluetooth ProMicro 
-To make the keyboard totally wireless, bluetooth enabled microcontrollers will be used. Normally, the microcontrollers used in hobbyist keyboards only allow for split keyboards ([example](https://kinesis-ergo.com/split-keyboards/)) by connecting one half (the "master") to the computer and connecting the other half (the "slave")  to the master via a cable, usually a [trrs cable](https://en.wikipedia.org/wiki/Phone_connector_(audio)). By using a microcontroller with the nRF52840 module, a bluetooth connection is established between the master and the slave as well as a separate connection between the master and the computer. This is preferred to having two connections to the computer and none between the halves as this would render chording impossible.
-
-### LiPoly Backpack
-This addon allows the microcontroller to charge an attached lithium battery.
-
-### Battery
-Pretty self explanatory.
-
-### Wireless Charging Receiver
-Qi enabled wireless charging receivers will be used to allow wireless charging of either half. In this manner, the keyboard will be truly wireless and require no ports on the exterior.
+## Wireless
+Normally, the microcontrollers used in hobbyist keyboards only allow for split keyboards ([example](https://kinesis-ergo.com/split-keyboards/)) by connecting one half (the "master") to the computer and connecting the other half (the "slave")  to the master via a cable, usually a [trrs cable](https://en.wikipedia.org/wiki/Phone_connector_(audio)). In order to make the keyboard communicate wirelessly, a setup identical to that of the [Mitosis](https://github.com/qmk/qmk_firmware/tree/master/keyboards/mitosis) is used. With wireless modules in either half and a third in a receiver attached to the computer, the halves send the key states to the receiver which in turn sends the states through an attached ProMicro in order to "type" a key. In doing research on split wireless keyboards, this seemed like a sweet spot. It is not prohibitive in the firmware that can be used similar to the [nrfMicro](https://github.com/joric/nrfmicro/) which requires a fork of the QMK firmware that supports nordic firmware for the wireless modules. Since the wireless modules in a Mitosis-like setup only send information to a receiving proMicro which is ultimately connected via USB, the firmware can live independently and the original repositories can be used.
+Taking it one step further, wireless charging is implemented in order to make the keyboard completely wireless. Unfortunately this is over half the total cost of the keyboard not including switches or keycaps as prices can vary wildly based on personal preference. Wireless charging and rechargable batteries in general can certainly be removed in order to reduce the price drastically.
 
 ## BOM
-| Quanitiy | Item | Price |
+* Prices don't include shipping
+# Receiver
+| Quantity | Item | Price |
 | --- | --- | --- |
-| 2 | [nRF52840 Express](https://www.adafruit.com/product/4481)	| $35.90 |
+| 1 | [Elite-C](https://keeb.io/products/elite-c-usb-c-pro-micro-replacement-arduino-compatible-atmega32u4)	| $17.99 |
+| 1 | [Mitosis Receiver Interface PCB](https://github.com/reversebias/mitosis-hardware/tree/master/gerbers)	| $5.40 from OSHpark for 3 boards |
+| 1 | [Small factor NRF51822](https://www.waveshare.com/core51822-b.htm)	| $6.99 |
+| 1 | [LED](https://www.digikey.com/product-detail/en/cree-inc/CLVBA-FKA-CAEDH8BBB7A363/CLVBA-FKA-CAEDH8BBB7A363CT-ND/2650500)	| $0.42 |
+| 1 | [3.3v regulator](https://www.digikey.com/product-detail/en/diodes-incorporated/AZ1117IH-3.3TRG1/AZ1117IH-3.3TRG1DICT-ND/5699682)	| $0.36 |
+| 2 | [Resistor array](https://www.digikey.com/product-detail/en/stackpole-electronics-inc/RAVF164DJT4K70/RAVF164DJT4K70CT-ND/2425255)	| $0.20 |
+| 2 | [SMD Button](https://www.digikey.com/product-detail/en/c-k/PTS525SM15SMTR2-LFS/CKN9104CT-ND/1146923)	| $0.62 |
+| 1 | [1x4pin right angle 0.1" header](https://www.sparkfun.com/products/9015)	| $0.95 |
+| Total | 	| $32.93 |
+
+
+# Keyboard
+| Quantity | Item | Price |
+| --- | --- | --- |
+| 1 | [30x1u Amoeba PCB](https://keeb.io/products/amoeba-single-switch-pcbs?_pos=1&_sid=ba1f06f84&_ss=r)	| $4.99 |
+| 2 | [NRF51822](https://www.waveshare.com/product/core51822.htm)	| $13.98 |
 | 2 | [LiPoly Backpack](https://www.adafruit.com/product/2124) | $9.90 |
 | 2 | [2000mAh Lithium Battery](https://www.adafruit.com/product/2011) | $25.00 |
 | 2 | [Qi Wireless Charging Receiver](https://www.adafruit.com/product/1901) | $29.90 |
-| 1 | [Mini Rotary Shaft Encoder (lot of 5)](https://www.aliexpress.com/item/32988694062.html?spm=2114.search0302.3.150.2b9053288aErqe&ws_ab_test=searchweb0_0,searchweb201602_0,searchweb201603_0,ppcSwitch_0&algo_pvid=b8f704f6-06c1-4fb3-bbef-edd8e0cd6a59&algo_expid=b8f704f6-06c1-4fb3-bbef-edd8e0cd6a59-21) | $7.80 |
 | 2 | [2 Axis Navigation Switch](https://www.digikey.com/product-detail/en/e-switch/JS5208/EG4561-ND/1739634) | $5.52 |
-| 1 | [Zilent 78g Switches (lot of 10)](https://zealpc.net/collections/switches/products/zilents) | $12.00 |
+| Total |  | $89.29 |
 
 ## TODO
 - [x] Build initial models
-- [x] Add rotary encoder cutout to keyboard model
-- [ ] Finalize locking mechanism for keyboard scaffold
-- [ ] Get dimensions for electronics
+- [x] Finalize locking mechanism for keyboard scaffold
+- [ ] Get dimensions for amoeba pcb
 - [ ] Add internal mounts for electronics
+- [ ] Build wireless firmware
+- [ ] Verify wireless firmware encryption

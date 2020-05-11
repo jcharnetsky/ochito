@@ -89,6 +89,7 @@ quickReleaseArmDi = 7.14 + tolerance;
 quickReleaseArmH = 10;
 quickReleaseButtonDi = quickReleaseArmDi;
 quickReleaseButtonHeadDi = quickReleaseButtonDi - 2;
+quickReleaseButtonHeadH = 8;
 quickReleaseButtonH = 10;
 quickReleaseSpringH = 12.7;
 
@@ -121,10 +122,12 @@ module keycap() {
                     cube([keycapW, keycapW, keycapH]);
     }
 }
+
 // Keycap covering d-pad
 module dpad() {
     cylinder(h = keycapH/2, d = keycapW);
 }
+
 // All keycaps (for visualization only)
 module keycaps() {
     color(keycapColor) {
@@ -147,6 +150,7 @@ module keycaps() {
 				dpad();
     }
 }
+
 // Micro-controller (for visualization only)
 module proMicro() {
     color("#000080") {
@@ -154,6 +158,7 @@ module proMicro() {
             cube([proMicroW, proMicroDe, proMicroH]);
     }
 }
+
 // Standoff to hold micro-controller in place
 module proMicroStandoff() {
 	difference() {
@@ -164,6 +169,7 @@ module proMicroStandoff() {
 			cube([proMicroStandoffW + 2, proMicroDe, 2]);
 	}
 }
+
 // Rechargable battery (for visualization only)
 module battery() {
     color("#000000") {
@@ -171,6 +177,7 @@ module battery() {
 			cube([batteryW, batteryDe, batteryH]);
     }
 }
+
 // Standoff to hold battery in place
 module batteryStandoff() {
 	difference() {
@@ -181,6 +188,7 @@ module batteryStandoff() {
 			cube([batteryStandoffW + 2, batteryDe, batteryH + chargerH]);
 	}
 }
+
 // Wireless charging receiver (for visualization only)
 module chargingReceiver() {
     color("#b87333") {
@@ -192,6 +200,7 @@ module chargingReceiver() {
         }
     }
 }
+
 // Cutouts for the five mechanical switches
 module switchCutouts() {
 	translate([keycapSpacing + keycapW/2 - switchHIn/2, pointerDe + keycapSpacing, fingerH - thickness - 1])
@@ -207,6 +216,7 @@ module switchCutouts() {
 					rotate([0, 0, thumbAngle -5])
 		cube([thickness + 2, switchHIn, switchHIn]);
 }
+
 module case(wall = 0) {
 	difference() {
 	hull() {
@@ -252,6 +262,7 @@ module case(wall = 0) {
 		cube([keycapW + keycapSpacing + 2*wall, fingerDe, keycapH]);
 	}
 }
+
 module screws(height, diameter) {
 		translate([fingerW/2 - screwStandoffD/2, -handR + screwStandoffD*7/8, 0])
 			cylinder(h = height, d = diameter);
@@ -262,6 +273,7 @@ module screws(height, diameter) {
 		translate([fingerW - thickness - 0.01, pinkyDe + keycapW - thickness, 0])
 			cylinder(h = height, d = diameter);
 }
+
 module lid() {
 	battery();
 	chargingReceiver();
@@ -293,6 +305,7 @@ module lid() {
 			batteryStandoff();
 	}
 }
+
 module base() {
 	translate([-(fingerW*1.1 - fingerW)/2, -((fingerDe + handR)*1.1 - (fingerDe + handR))/4, -baseH + baseIndent - lidH])
 	difference() {
@@ -303,34 +316,35 @@ module base() {
 
 		// Indent
 		translate([2*(fingerW*1.02 - fingerW), ((fingerDe + handR)*1.02 - (fingerDe + handR)), baseH - baseIndent])
-		scale([1.02, 1.02, 1.02])
-			case();
+			scale([1.02, 1.02, 1.02])
+				case();
 
 		// Front opening to slide in case
 		translate([-fingerW/2, fingerDe - 1.5*keycapW, baseH - baseIndent])
-		cube([2*fingerW, 2*(fingerDe + handR), baseIndent + 1]);
+			cube([2*fingerW, 2*(fingerDe + handR), baseIndent + 1]);
 
 		// Quick release channel
 		translate([1.1*fingerW - quickReleaseButtonH - quickReleaseArmH - quickReleaseSpringH - 3, 0, baseH - baseIndent - quickReleaseArmDi/2 - tolerance])
-		rotate([0, 90, 0])
-		cylinder(h = quickReleaseArmH + quickReleaseButtonH + quickReleaseSpringH + 2*tolerance, d = quickReleaseArmDi + tolerance);
+			rotate([0, 90, 0])
+				cylinder(h = quickReleaseArmH + quickReleaseButtonH + quickReleaseSpringH + 2*tolerance, d = quickReleaseArmDi + tolerance);
 
 		// Top opening to channel
-	translate([1.1*fingerW - quickReleaseButtonH - quickReleaseArmH - 3, -(quickReleaseArmDi/2 + tolerance), baseH - baseIndent - quickReleaseArmDi/2 + 0.1])
-	cube([quickReleaseArmH + 2*tolerance, 2*(quickReleaseArmDi/2 + tolerance), quickReleaseArmDi]);
+		translate([1.1*fingerW - quickReleaseButtonH - quickReleaseArmH - 3, -(quickReleaseArmDi/2 + tolerance), baseH - baseIndent - quickReleaseArmDi/2 + 0.1])
+			cube([quickReleaseArmH + 2*tolerance, 2*(quickReleaseArmDi/2 + tolerance), quickReleaseArmDi]);
 
 		// Button hole
 		translate([1.1*fingerW - 3, 0, baseH - baseIndent - quickReleaseArmDi/2 - tolerance])
-		rotate([0, 90, 0])
-		cylinder(h = 4, d = quickReleaseButtonHeadDi + tolerance);
+			rotate([0, 90, 0])
+				cylinder(h = 4, d = quickReleaseButtonHeadDi + tolerance);
 	}
-translate([-sin(thumbAngle - 17)*leftSideChannelDe + 5.34, -leftSideChannelDe + pinkyDe, -lidDistance + lidH/2 - sideChannelW/2])
-	rotate([0, 0, thumbAngle - 5])
-		cube([2*sideChannelW, leftSideChannelDe, sideChannelW - tolerance]);
-translate([fingerW - sideChannelW + 0.05 + tolerance, -rightSideChannelDe + pinkyDe, -lidDistance + lidH/2 - sideChannelW/2])
-	cube([2*sideChannelW - tolerance, rightSideChannelDe, sideChannelW - tolerance]);
+	translate([-sin(thumbAngle - 17)*leftSideChannelDe + 5.34, -leftSideChannelDe + pinkyDe, -lidDistance + lidH/2 - sideChannelW/2])
+		rotate([0, 0, thumbAngle - 5])
+			cube([2*sideChannelW, leftSideChannelDe, sideChannelW - tolerance]);
+	translate([fingerW - sideChannelW + 0.05 + tolerance, -rightSideChannelDe + pinkyDe, -lidDistance + lidH/2 - sideChannelW/2])
+		cube([2*sideChannelW - tolerance, rightSideChannelDe, sideChannelW - tolerance]);
 
 }
+
 module keyboard() {
 	color(keyboardColor) {
 		// Hollow out screw standoffs
@@ -354,7 +368,23 @@ module keyboard() {
 	}
 }
 
-//keyboard();
-//keycaps();
-//lid();
-base();
+module quickRelease() {
+	translate([fingerW*1.1 - thickness - 4.7, -((fingerDe + handR)*1.1 - (fingerDe + handR))/4, -quickReleaseArmDi])
+	union() {
+		translate([-quickReleaseArmH - quickReleaseButtonH, 0, 0])
+			rotate([0, 90, 0])
+				cylinder(h = quickReleaseArmH, d = quickReleaseArmDi);
+		translate([-quickReleaseArmH/2 - quickReleaseButtonH, 0, 0])
+			cylinder(h = quickReleaseArmH/1.2, d = quickReleaseArmDi/1.5);
+		translate([-quickReleaseButtonH, 0, 0])
+			rotate([0, 90, 0])
+				cylinder(h = quickReleaseButtonH, d = quickReleaseButtonDi);
+		rotate([0, 90, 0])
+			cylinder(h = quickReleaseButtonHeadH, d = quickReleaseButtonHeadDi);
+	}
+}
+
+keyboard();
+keycaps();
+lid();
+//base();
