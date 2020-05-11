@@ -16,11 +16,12 @@ While the letter layout might seem random at first, it's in fact a modification 
 ![Type 82 Key Layout](./images/keymap.png)
 
 ## Wireless
-Normally, the microcontrollers used in hobbyist keyboards only allow for split keyboards ([example](https://kinesis-ergo.com/split-keyboards/)) by connecting one half (the "master") to the computer and connecting the other half (the "slave")  to the master via a cable, usually a [trrs cable](https://en.wikipedia.org/wiki/Phone_connector_(audio)). In order to make the keyboard communicate wirelessly, a setup identical to that of the [Mitosis](https://github.com/qmk/qmk_firmware/tree/master/keyboards/mitosis) is used. With wireless modules in either half and a third in a receiver attached to the computer, the halves send the key states to the receiver which in turn sends the states through an attached ProMicro in order to "type" a key. In doing research on split wireless keyboards, this seemed like a sweet spot. It is not prohibitive in the firmware that can be used similar to the [nrfMicro](https://github.com/joric/nrfmicro/) which requires a fork of the QMK firmware that supports nordic firmware for the wireless modules. Since the wireless modules in a Mitosis-like setup only send information to a receiving proMicro which is ultimately connected via USB, the firmware can live independently and the original repositories can be used.
+Normally, the microcontrollers used in hobbyist keyboards only allow for split keyboards ([example](https://kinesis-ergo.com/split-keyboards/)) by connecting one half (the "master") to the computer and connecting the other half (the "slave")  to the master via a cable, usually a [trrs cable](https://en.wikipedia.org/wiki/Phone_connector_(audio)). In order to make the keyboard communicate wirelessly, a setup identical to that of the [Mitosis](https://github.com/qmk/qmk_firmware/tree/master/keyboards/mitosis) is used. With wireless modules in either half and a third in a receiver attached to the computer, the halves send the key states to the receiver which in turn sends the states through an attached ProMicro in order to "type" a key. 
+
 Taking it one step further, wireless charging is implemented in order to make the keyboard completely wireless. Unfortunately this is over half the total cost of the keyboard not including switches or keycaps as prices can vary wildly based on personal preference. Wireless charging and rechargable batteries in general can certainly be removed in order to reduce the price drastically.
 
 ## BOM
-* Prices don't include shipping
+Prices do not include shipping
 # Receiver
 | Quantity | Item | Price |
 | --- | --- | --- |
@@ -32,7 +33,7 @@ Taking it one step further, wireless charging is implemented in order to make th
 | 2 | [Resistor array](https://www.digikey.com/product-detail/en/stackpole-electronics-inc/RAVF164DJT4K70/RAVF164DJT4K70CT-ND/2425255)	| $0.20 |
 | 2 | [SMD Button](https://www.digikey.com/product-detail/en/c-k/PTS525SM15SMTR2-LFS/CKN9104CT-ND/1146923)	| $0.62 |
 | 1 | [1x4pin right angle 0.1" header](https://www.sparkfun.com/products/9015)	| $0.95 |
-| Total | 	| $32.93 |
+|  | Total | $32.93 |
 
 
 # Keyboard
@@ -44,7 +45,7 @@ Taking it one step further, wireless charging is implemented in order to make th
 | 2 | [2000mAh Lithium Battery](https://www.adafruit.com/product/2011) | $25.00 |
 | 2 | [Qi Wireless Charging Receiver](https://www.adafruit.com/product/1901) | $29.90 |
 | 2 | [2 Axis Navigation Switch](https://www.digikey.com/product-detail/en/e-switch/JS5208/EG4561-ND/1739634) | $5.52 |
-| Total |  | $89.29 |
+| | Total | $89.29 |
 
 ## TODO
 - [x] Build initial models
