@@ -2,9 +2,10 @@ include <knurledFinishLib_v2.scad>;
 
 $fn=100;
 
-keycapColor = "#5d432c";
-keyboardColor = "#242424";
-highlightKeycapColor = "#3ba8a8";
+
+keycapColor = "#f0c674";
+keyboardColor = "#c5c8c6";
+highlightKeycapColor = "#f0c674";
 
 thickness = 2;
 tolerance = 0.2;
@@ -39,11 +40,6 @@ pointerDe = 0.55 * fingerDe;
 middleDe = fingerDe - keycapW;
 ringDe = 0.6 * fingerDe;
 pinkyDe = 0.43 * fingerDe;
-
-// Thickness of bottom lid
-lidH = 3;
-// Distance from keyboard to render lid
-lidDistance = lidH;
 
 // Rechargable battery (for visualization only)
 batteryW = 60;
@@ -80,10 +76,6 @@ screwStandoffD = screwD + 2;
 counterSinkH = 1;
 screwHeadD = 4;
 
-// Base to attach keyboard to chair
-baseH = 15;
-baseIndent = 4;
-
 // Quick release mechanism
 quickReleaseArmDi = 7.14 + tolerance;
 quickReleaseArmH = 10;
@@ -91,12 +83,27 @@ quickReleaseButtonDi = quickReleaseArmDi;
 quickReleaseButtonHeadDi = quickReleaseButtonDi - 2;
 quickReleaseButtonHeadH = 8;
 quickReleaseButtonH = 10;
+quickReleaseButtonWall = 4;
 quickReleaseSpringH = 12.7;
+quickReleaseOpeningW = quickReleaseArmH + 2*tolerance;
+
+// Thickness of bottom lid
+lidH = thickness*3;
+
+// Base to attach keyboard to chair
+baseScale = 1.1;
+baseIndentScale = 1.02;
+baseH = 15;
+baseIndent = lidH/2;
+
+// Distance from keyboard to render lid
+lidDistance = lidH;
+
+sideChannelH = baseIndent/2;
+lidQuickReleaseChannelDe = handR - (((fingerDe + handR)*baseScale - (fingerDe + handR))/4 - quickReleaseArmDi/2);
 
 // Channel to hold keyboard in place on base
-rightSideChannelDe = 0.5*fingerW;
-leftSideChannelDe = 0.6*fingerW;
-sideChannelW = thickness/2 + tolerance;
+channelScale = baseScale - 0.04;
 
 // Single keycap (for visualization only)
 module keycap() {
@@ -125,7 +132,11 @@ module keycap() {
 
 // Keycap covering d-pad
 module dpad() {
-    cylinder(h = keycapH/2, d = keycapW);
+	cylinder(h = keycapH/2, d = keycapW);
+    for ( i = [1:4]) {
+		translate([0, 0, -i*(keycapH/10)])
+			cylinder(h = keycapH/10, d = keycapW - i*3);
+	}
 }
 
 // All keycaps (for visualization only)
@@ -145,9 +156,9 @@ module keycaps() {
     }
 
     color(highlightKeycapColor) {
-		translate([-(thickness + sin(thumbAngle - 4)*keycapW), sin(thumbAngle - 4)*keycapW, fingerH/2])
-			rotate([0, 90, thumbAngle - 4])
-				dpad();
+        	translate([-(thickness + sin(thumbAngle - 4)*keycapW), sin(thumbAngle - 4)*keycapW, fingerH/2])
+        		rotate([0, 90, thumbAngle - 4])
+        			dpad();
     }
 }
 
@@ -282,9 +293,10 @@ module lid() {
 	translate([0, 0, -lidDistance])
 	color(keyboardColor) {
 		difference() {
+			scale([1, 1, lidH*10])
 			intersection() {
 				case(0);
-				translate([-thumbDe, -handR, -handR + lidH])
+				translate([-thumbDe, -handR, -handR + 0.1])
 					cube([thumbDe + fingerW, fingerDe + handR, handR]);
 			}
 			translate([0, 0, -(lidH + 0.01)])
@@ -293,30 +305,76 @@ module lid() {
 				screws(counterSinkH, screwHeadD);
 
 			// Channel cutouts
-			translate([sin(thumbAngle - 5)*leftSideChannelDe - 8.1, -leftSideChannelDe + pinkyDe, lidH/2 - sideChannelW/2])
-				rotate([0, 0, thumbAngle - 5])
-					cube([sideChannelW, leftSideChannelDe, sideChannelW]);
-			translate([fingerW - sideChannelW + 0.05, -rightSideChannelDe + pinkyDe, lidH/2 - sideChannelW/2])
-				cube([sideChannelW, rightSideChannelDe, sideChannelW]);
+			sideChannels(innerScale=0.98, height=sideChannelH);
+
+			quickReleaseChannel();
 		}
+		// ProMicro standoff
 		translate([fingerW/2 - proMicroStandoffW/2, -(proMicroStandoffDe + (batteryStandoffDe - batteryDe)/2), lidH])
 			proMicroStandoff();
+
+		// Battery Standoff
 		translate([fingerW/2 - batteryStandoffW/2, -(batteryStandoffDe - batteryDe)/2, lidH])
 			batteryStandoff();
+
+		// Quickrelease channel
 	}
 }
 
-module base() {
-	translate([-(fingerW*1.1 - fingerW)/2, -((fingerDe + handR)*1.1 - (fingerDe + handR))/4, -baseH + baseIndent - lidH])
+module sideChannels(innerScale, height) {
+	translate([-(fingerW*channelScale - fingerW)/2, 0, baseIndent - height])
 	difference() {
-		scale([1.1, 1.1, 1.1])
+		scale([channelScale, channelScale, 1]) {
+			intersection() {
+				case(0);
+				translate([-thumbDe, -handR, -handR + height])
+					cube([thumbDe + fingerW, fingerDe + handR, handR]);
+			}
+		}
+		translate([fingerW*((1-innerScale)/2) - fingerW*((1-channelScale)/2) , 0, -0.01])
+		scale([innerScale, innerScale, 1.01]) {
+			intersection() {
+				case(0);
+				translate([-thumbDe, -handR, -handR + height])
+					cube([thumbDe + fingerW, fingerDe + handR, handR]);
+			}
+		}
+		translate([-fingerW/2, pinkyDe, -0.01])
+			cube([fingerW*2, fingerDe, lidH*channelScale]);
+	}
+}
+
+module quickReleaseChannel() {
+	// Lid channel cutout
+	translate([baseScale*fingerW - quickReleaseButtonWall - 2*quickReleaseArmDi - quickReleaseButtonH - quickReleaseArmDi/2 - tolerance, -((fingerDe + handR)*baseScale - (fingerDe + handR))/4 - quickReleaseArmDi/2, -lidH*0.01])
+		cube([2*quickReleaseArmDi, quickReleaseArmDi, sideChannelH]);
+
+	translate([baseScale*fingerW - quickReleaseButtonWall - 2*quickReleaseArmDi - quickReleaseButtonH - quickReleaseArmDi/2 - tolerance, -((fingerDe + handR)*baseScale - (fingerDe + handR))/4 - quickReleaseArmDi/2, -lidH*0.01])
+	mirror([0, 1, 0])
+	rotate([0, 0, -asin((2*quickReleaseArmDi)/lidQuickReleaseChannelDe)])
+		cube([quickReleaseArmDi, lidQuickReleaseChannelDe, sideChannelH]);
+
+	translate([baseScale*fingerW - quickReleaseButtonWall - 2*quickReleaseArmDi - quickReleaseButtonH - quickReleaseArmDi/2 - tolerance, -((fingerDe + handR)*baseScale - (fingerDe + handR))/4 - quickReleaseArmDi/2, -lidH*0.01])
+	mirror([0, 1, 0])
+	rotate([0, 0, -asin((2*quickReleaseArmDi)/lidQuickReleaseChannelDe)/2])
+		cube([quickReleaseArmDi, lidQuickReleaseChannelDe, sideChannelH]);
+
+	translate([baseScale*fingerW - quickReleaseButtonWall - 2*quickReleaseArmDi - quickReleaseButtonH - quickReleaseArmDi/2 - tolerance, -((fingerDe + handR)*baseScale - (fingerDe + handR))/4 - quickReleaseArmDi/2, -lidH*0.01])
+	mirror([0, 1, 0])
+		cube([quickReleaseArmDi, lidQuickReleaseChannelDe, sideChannelH]);
+}
+
+module base() {
+	translate([-(fingerW*baseScale - fingerW)/2, -((fingerDe + handR)*baseScale - (fingerDe + handR))/4, -baseH + baseIndent - lidH])
+	difference() {
+		scale(baseScale)
 			case();
 		translate([-400, -400, baseH])
 			cube([1000, 1000, 1000]);
 
 		// Indent
-		translate([2*(fingerW*1.02 - fingerW), ((fingerDe + handR)*1.02 - (fingerDe + handR)), baseH - baseIndent])
-			scale([1.02, 1.02, 1.02])
+		translate([2*(fingerW*baseIndentScale - fingerW), (fingerDe + handR)*baseIndentScale - fingerDe - handR, baseH - baseIndent])
+			scale(baseIndentScale)
 				case();
 
 		// Front opening to slide in case
@@ -324,25 +382,22 @@ module base() {
 			cube([2*fingerW, 2*(fingerDe + handR), baseIndent + 1]);
 
 		// Quick release channel
-		translate([1.1*fingerW - quickReleaseButtonH - quickReleaseArmH - quickReleaseSpringH - 3, 0, baseH - baseIndent - quickReleaseArmDi/2 - tolerance])
+		translate([baseScale*fingerW - quickReleaseButtonH - quickReleaseArmH - quickReleaseSpringH - quickReleaseButtonWall, 0, baseH - baseIndent - quickReleaseArmDi/2 - tolerance])
 			rotate([0, 90, 0])
 				cylinder(h = quickReleaseArmH + quickReleaseButtonH + quickReleaseSpringH + 2*tolerance, d = quickReleaseArmDi + tolerance);
 
 		// Top opening to channel
-		translate([1.1*fingerW - quickReleaseButtonH - quickReleaseArmH - 3, -(quickReleaseArmDi/2 + tolerance), baseH - baseIndent - quickReleaseArmDi/2 + 0.1])
-			cube([quickReleaseArmH + 2*tolerance, 2*(quickReleaseArmDi/2 + tolerance), quickReleaseArmDi]);
+		translate([baseScale*fingerW - quickReleaseOpeningW - quickReleaseButtonWall - quickReleaseArmH, -(quickReleaseArmDi/2 + tolerance), baseH - baseIndent - quickReleaseArmDi/2 + 0.1])
+			cube([quickReleaseOpeningW, 2*(quickReleaseArmDi/2 + tolerance), quickReleaseArmDi]);
 
 		// Button hole
-		translate([1.1*fingerW - 3, 0, baseH - baseIndent - quickReleaseArmDi/2 - tolerance])
+		translate([baseScale*fingerW - quickReleaseButtonWall*1.05, 0, baseH - baseIndent - quickReleaseArmDi/2 - tolerance])
 			rotate([0, 90, 0])
-				cylinder(h = 4, d = quickReleaseButtonHeadDi + tolerance);
+				cylinder(h = quickReleaseButtonWall*1.1, d = quickReleaseButtonHeadDi + tolerance);
 	}
-	translate([-sin(thumbAngle - 17)*leftSideChannelDe + 5.34, -leftSideChannelDe + pinkyDe, -lidDistance + lidH/2 - sideChannelW/2])
-		rotate([0, 0, thumbAngle - 5])
-			cube([2*sideChannelW, leftSideChannelDe, sideChannelW - tolerance]);
-	translate([fingerW - sideChannelW + 0.05 + tolerance, -rightSideChannelDe + pinkyDe, -lidDistance + lidH/2 - sideChannelW/2])
-		cube([2*sideChannelW - tolerance, rightSideChannelDe, sideChannelW - tolerance]);
-
+	// Side channels
+	translate([0, 0, -lidH])
+		sideChannels(innerScale=0.99, height=(sideChannelH-2*tolerance));
 }
 
 module keyboard() {
@@ -369,13 +424,13 @@ module keyboard() {
 }
 
 module quickRelease() {
-	translate([fingerW*1.1 - thickness - 4.7, -((fingerDe + handR)*1.1 - (fingerDe + handR))/4, -quickReleaseArmDi])
+	translate([baseScale*fingerW - 2*quickReleaseButtonWall, -((fingerDe + handR)*baseScale - (fingerDe + handR))/4, -lidH - quickReleaseArmDi/2 - tolerance])
 	union() {
 		translate([-quickReleaseArmH - quickReleaseButtonH, 0, 0])
 			rotate([0, 90, 0])
 				cylinder(h = quickReleaseArmH, d = quickReleaseArmDi);
-		translate([-quickReleaseArmH/2 - quickReleaseButtonH, 0, 0])
-			cylinder(h = quickReleaseArmH/1.2, d = quickReleaseArmDi/1.5);
+		translate([-quickReleaseArmH - quickReleaseArmDi/2, 0, 0])
+			cylinder(h = quickReleaseArmDi/2 + sideChannelH, d = quickReleaseArmDi);
 		translate([-quickReleaseButtonH, 0, 0])
 			rotate([0, 90, 0])
 				cylinder(h = quickReleaseButtonH, d = quickReleaseButtonDi);
@@ -387,4 +442,13 @@ module quickRelease() {
 keyboard();
 keycaps();
 lid();
-//base();
+base();
+quickRelease();
+
+translate([-40, 0, 0])
+rotate([0, 0, 240])
+mirror([0, 1, 0]) {
+	//keyboard();
+	//keycaps();
+	//lid();
+}
