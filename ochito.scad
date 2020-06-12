@@ -1,7 +1,4 @@
-include <knurledFinishLib_v2.scad>;
-
 $fn=100;
-
 
 keycapColor = "#f0c674";
 keyboardColor = "#c5c8c6";
@@ -19,27 +16,34 @@ keycapSpacing = 1;
 
 // Area where fingers rest
 fingerW = 4*keycapW + 5*keycapSpacing;
-fingerDe = 60;
+fingerDe = 89;
 fingerH = keycapW + 5;
 
 // Radius of cylinder made by arched hand
-handR = fingerW/2;
+handR = 45;
+
+// Dpad
+dpadH = 12.3;
+dpadW = 12.5;
+dpadHeadW = 3.3;
+
+dpadSwitchH = 5;
 
 // Extension for thumb controlled dpad
-thumbW = 10;
-thumbDe = 36;
-thumbH = fingerH;
-thumbAngle = 20;
+thumbW = 15;
+thumbDe = 54;
+thumbH = dpadH*2;
+thumbAngle = 8;
 
 // Mechanical keyboard switch
 switchHOut = 15.6;
-switchHIn = 14.6;
+switchHIn = 13.94;
 
 // Depth each finger reaches into finger area
-pointerDe = 0.55 * fingerDe;
 middleDe = fingerDe - keycapW;
-ringDe = 0.6 * fingerDe;
-pinkyDe = 0.43 * fingerDe;
+pointerDe = fingerDe - keycapW*1.5;
+ringDe = fingerDe - keycapW*1.5;
+pinkyDe = fingerDe - keycapW*2;
 
 // Rechargable battery (for visualization only)
 batteryW = 60;
@@ -70,9 +74,9 @@ chargerChipDe = 36;
 chargerChipH = 0.3;
 
 // Screw standoffs to connect lid to case
-screwD = 2;
+screwStandoffD = 5.8;
+screwD = 3 + tolerance;
 screwStandoffH = 10;
-screwStandoffD = screwD + 2;
 counterSinkH = 1;
 screwHeadD = 4;
 
@@ -132,10 +136,16 @@ module keycap() {
 
 // Keycap covering d-pad
 module dpad() {
-	cylinder(h = keycapH/2, d = keycapW);
-    for ( i = [1:4]) {
-		translate([0, 0, -i*(keycapH/10)])
-			cylinder(h = keycapH/10, d = keycapW - i*3);
+	difference() {
+		union() {
+			cylinder(h = keycapH/2, d = keycapW);
+		    for ( i = [1:4]) {
+				translate([0, 0, -i*(keycapH/10)])
+					cylinder(h = keycapH/10, d = keycapW - i*3);
+			}
+		}
+		translate([-dpadHeadW/2, -dpadHeadW/2, keycapH/2 - dpadHeadW])
+		cube([dpadHeadW, dpadHeadW, dpadHeadW + tolerance]);
 	}
 }
 
@@ -223,8 +233,8 @@ module switchCutouts() {
 	translate([4*keycapSpacing + keycapW/2 - switchHIn/2 + 3*keycapW, pinkyDe + keycapSpacing, fingerH - thickness - 1])
 		cube([switchHIn, switchHIn, thickness + 2]);
 
-	translate([-thickness + sin(thumbAngle)*thickness, -sin(thumbAngle)*thickness, fingerH/2 - switchHIn/2])
-					rotate([0, 0, thumbAngle -5])
+	translate([-sin(thumbAngle)*(thumbDe + 2*switchHIn), cos(thumbAngle)*(thumbDe/4 + switchHIn/4), switchHIn/2])
+	    rotate([0, 0, thumbAngle])
 		cube([thickness + 2, switchHIn, switchHIn]);
 }
 
@@ -238,16 +248,23 @@ module case(wall = 0) {
 			translate([-handR, -handR, -2*handR])
 				cube([handR*2 - wall, handR*2 - wall, handR*2 - wall]);
 		}
-
+		//translate([fingerW/2, -3*handR/5, 0])
+		//difference() {
+		//	translate([0, 0, -3*handR/4])
+		//	sphere(r = handR - wall);
+		//	translate([-handR, -handR, -2*handR])
+		//		cube([handR*2 - wall, handR*2 - wall, handR*2 - wall]);
+		//}
 		difference() {
 			union() {
 				// Finger base
 				translate([wall, 0, 0])
 				cube([fingerW - 2*wall, fingerDe - wall, fingerH - wall]);
+
 				// Thumb extension
-				translate([-thumbW + sin(thumbAngle)*(thumbDe + wall) + tolerance, -sin(thumbAngle)*(thumbW - 2*wall), 0])
+				translate([-sin(thumbAngle)*(thumbDe) + wall, -sin(thumbAngle)*(thumbW - 2*wall), 0])
 					rotate([0, 0, thumbAngle])
-						cube([thumbW - 2*wall, thumbDe - wall, thumbH - wall]);
+						cube([thumbW - 2*wall, thumbDe - wall, thumbH + dpadH/2]);
 			}
 
 			// Finger end cutouts
@@ -274,15 +291,35 @@ module case(wall = 0) {
 	}
 }
 
-module screws(height, diameter) {
-		translate([fingerW/2 - screwStandoffD/2, -handR + screwStandoffD*7/8, 0])
+module screws(height, diameter, cap) {
+		translate([fingerW/2 - screwStandoffD/2, -handR + screwStandoffD - 0.5, 0]) {
 			cylinder(h = height, d = diameter);
-		translate([thickness, pointerDe + keycapW - thickness, 0])
+			if (cap) {
+				translate([0, 0, height])
+				sphere(d = diameter);
+			}
+		}
+		translate([screwStandoffD/2, pointerDe + keycapW - screwStandoffD + 2, 0]) {
 			cylinder(h = height, d = diameter);
-		translate([4.6*thickness, -fingerW/4, 0])
+			if (cap) {
+				translate([0, 0, height])
+				sphere(d = diameter);
+			}
+		}
+		translate([2*thickness, -fingerW/4 - 0.8, 0]) {
 			cylinder(h = height, d = diameter);
-		translate([fingerW - thickness - 0.01, pinkyDe + keycapW - thickness, 0])
+			if (cap) {
+				translate([0, 0, height])
+				sphere(d = diameter);
+			}
+		}
+		translate([fingerW - screwStandoffD + 2, pinkyDe + keycapW - thickness - 2, 0]) {
 			cylinder(h = height, d = diameter);
+			if (cap) {
+				translate([0, 0, height])
+				sphere(d = diameter);
+			}
+		}
 }
 
 module lid() {
@@ -300,9 +337,9 @@ module lid() {
 					cube([thumbDe + fingerW, fingerDe + handR, handR]);
 			}
 			translate([0, 0, -(lidH + 0.01)])
-				screws(screwStandoffH, screwD);
+				screws(screwStandoffH, screwD, false);
 			translate([0, 0, -0.01])
-				screws(counterSinkH, screwHeadD);
+				screws(counterSinkH, screwHeadD, false);
 
 			// Channel cutouts
 			sideChannels(innerScale=0.98, height=sideChannelH);
@@ -414,11 +451,12 @@ module keyboard() {
 				}
 
 				// Screw standoffs
-				screws(screwStandoffH, screwStandoffD);
+				screws(screwStandoffH, screwStandoffD + 2, true);
+
 			}
 
 			translate([0, 0, -2])
-			screws(screwStandoffH, screwD);
+			screws(screwStandoffH, screwStandoffD, false);
 		}
 	}
 }
@@ -440,10 +478,10 @@ module quickRelease() {
 }
 
 keyboard();
-keycaps();
-lid();
-base();
-quickRelease();
+//keycaps();
+//lid();
+//base();
+//quickRelease();
 
 translate([-40, 0, 0])
 rotate([0, 0, 240])
