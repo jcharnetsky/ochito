@@ -1,5 +1,7 @@
 $fn=100;
 
+dpadMX = true;
+
 keycapColor = "#f0c674";
 keyboardColor = "#c5c8c6";
 highlightKeycapColor = "#f0c674";
@@ -16,8 +18,12 @@ keycapSpacing = 1;
 
 // Area where fingers rest
 fingerW = 4*keycapW + 5*keycapSpacing;
-fingerDe = 89;
+fingerDe = 76;
 fingerH = keycapW + 5;
+pointerH = fingerH;
+middleH = fingerH - 3;
+ringH = fingerH - 6;
+pinkyH = fingerH - 9;
 
 // Radius of cylinder made by arched hand
 handR = 45;
@@ -25,13 +31,14 @@ handR = 45;
 // Dpad
 dpadH = 12.3;
 dpadW = 12.5;
+dpadDe = 5;
 dpadHeadW = 3.3;
 
 dpadSwitchH = 5;
 
 // Extension for thumb controlled dpad
 thumbW = 15;
-thumbDe = 54;
+thumbDe = 36;
 thumbH = dpadH*2;
 thumbAngle = 8;
 
@@ -40,14 +47,18 @@ switchHOut = 15.6;
 switchHIn = 13.94;
 
 // Depth each finger reaches into finger area
-middleDe = fingerDe - keycapW;
-pointerDe = fingerDe - keycapW*1.5;
-ringDe = fingerDe - keycapW*1.5;
-pinkyDe = fingerDe - keycapW*2;
+middleDe = fingerDe;
+pointerDe = fingerDe - keycapW*0.5;
+ringDe = fingerDe - keycapW*0.5;
+pinkyDe = fingerDe - keycapW*1;
+
+switchToPcb = 3.3;
+pcbH = 1.615 + tolerance;
+pcbW = 19 + tolerance;
 
 // Rechargable battery (for visualization only)
 batteryW = 60;
-batteryDe = 36;
+batteryDe = 38;
 batteryH = 7;
 
 // Arms that hold onto battery
@@ -56,12 +67,12 @@ batteryStandoffDe = batteryDe + 4;
 batteryStandoffH = batteryH + 2;
 
 // Micro-controller (for visualization only)
-proMicroW = 36;
-proMicroDe = 17.6;
+proMicroW = 32.4;
+proMicroDe = 24.7;
 proMicroH = 5.3;
 
 // Sled that holds onto micro-controller
-proMicroStandoffW = proMicroW + 4;
+proMicroStandoffW = proMicroW;
 proMicroStandoffDe = proMicroDe + 4;
 proMicroStandoffH = proMicroH - 0.1;
 
@@ -74,9 +85,9 @@ chargerChipDe = 36;
 chargerChipH = 0.3;
 
 // Screw standoffs to connect lid to case
+screwStandoffH = 4;
 screwStandoffD = 5.8;
 screwD = 3 + tolerance;
-screwStandoffH = 10;
 counterSinkH = 1;
 screwHeadD = 4;
 
@@ -184,8 +195,8 @@ module proMicro() {
 module proMicroStandoff() {
 	difference() {
 		cube([proMicroStandoffW, proMicroStandoffDe, proMicroStandoffH]);
-		translate([-1, proMicroStandoffDe/2 - proMicroDe/2 + 1, 0.1])
-			cube([proMicroStandoffW + 2, proMicroDe - 2, proMicroH]);
+		translate([-1, proMicroStandoffDe/2 - proMicroDe/2 + 0.5, 0.1])
+			cube([proMicroStandoffW + 2, proMicroDe - 1, proMicroH]);
 		translate([-1, proMicroStandoffDe/2 - proMicroDe/2, 1])
 			cube([proMicroStandoffW + 2, proMicroDe, 2]);
 	}
@@ -224,16 +235,16 @@ module chargingReceiver() {
 
 // Cutouts for the five mechanical switches
 module switchCutouts() {
-	translate([keycapSpacing + keycapW/2 - switchHIn/2, pointerDe + keycapSpacing, fingerH - thickness - 1])
-		cube([switchHIn, switchHIn, thickness + 2]);
-	translate([2*keycapSpacing + keycapW/2 - switchHIn/2 + keycapW, middleDe + keycapSpacing, fingerH - thickness - 1])
-		cube([switchHIn, switchHIn, thickness + 2]);
-	translate([3*keycapSpacing + keycapW/2 - switchHIn/2 + 2*keycapW, ringDe + keycapSpacing, fingerH - thickness - 1])
-		cube([switchHIn, switchHIn, thickness + 2]);
-	translate([4*keycapSpacing + keycapW/2 - switchHIn/2 + 3*keycapW, pinkyDe + keycapSpacing, fingerH - thickness - 1])
-		cube([switchHIn, switchHIn, thickness + 2]);
+	translate([keycapSpacing + keycapW/2 - switchHIn/2, pointerDe - keycapW/2 - switchHIn/2, 0])
+		cube([switchHIn, switchHIn, handR]);
+	translate([3*keycapSpacing + keycapW/2 - switchHIn/2 + keycapW, middleDe - keycapW/2 - switchHIn/2, 0])
+		cube([switchHIn, switchHIn, handR]);
+	translate([5*keycapSpacing + keycapW/2 - switchHIn/2 + 2*keycapW, ringDe - keycapW/2 - switchHIn/2, 0])
+		cube([switchHIn, switchHIn, handR]);
+	translate([7*keycapSpacing + keycapW/2 - switchHIn/2 + 3*keycapW, pinkyDe - keycapW/2 - switchHIn/2, 0])
+		cube([switchHIn, switchHIn, handR]);
 
-	translate([-sin(thumbAngle)*(thumbDe + 2*switchHIn), cos(thumbAngle)*(thumbDe/4 + switchHIn/4), switchHIn/2])
+	translate([-sin(thumbAngle)*(4*switchHIn), cos(thumbAngle)*(switchHIn/16), switchHIn/2])
 	    rotate([0, 0, thumbAngle])
 		cube([thickness + 2, switchHIn, switchHIn]);
 }
@@ -248,84 +259,79 @@ module case(wall = 0) {
 			translate([-handR, -handR, -2*handR])
 				cube([handR*2 - wall, handR*2 - wall, handR*2 - wall]);
 		}
-		//translate([fingerW/2, -3*handR/5, 0])
-		//difference() {
-		//	translate([0, 0, -3*handR/4])
-		//	sphere(r = handR - wall);
-		//	translate([-handR, -handR, -2*handR])
-		//		cube([handR*2 - wall, handR*2 - wall, handR*2 - wall]);
-		//}
+		translate([fingerW/2, -3*handR/5, 0])
 		difference() {
-			union() {
-				// Finger base
-				translate([wall, 0, 0])
-				cube([fingerW - 2*wall, fingerDe - wall, fingerH - wall]);
-
-				// Thumb extension
-				translate([-sin(thumbAngle)*(thumbDe) + wall, -sin(thumbAngle)*(thumbW - 2*wall), 0])
-					rotate([0, 0, thumbAngle])
-						cube([thumbW - 2*wall, thumbDe - wall, thumbH + dpadH/2]);
-			}
-
-			// Finger end cutouts
-			translate([-tolerance, pointerDe + keycapW - wall, -tolerance/2])
-				cube([keycapW + keycapSpacing + tolerance, fingerDe - pointerDe - keycapW + tolerance, fingerH + tolerance]);
-
-			translate([2*keycapW + 3*keycapSpacing, ringDe + keycapW - wall, -tolerance/2])
-				cube([keycapW + keycapSpacing, fingerDe - ringDe - keycapW + tolerance, fingerH + tolerance]);
-			translate([3*keycapW + 4*keycapSpacing - 0.005, pinkyDe + keycapW - wall, -tolerance/2])
-				cube([keycapW + keycapSpacing + tolerance, fingerDe - pinkyDe - keycapW + tolerance, fingerH + tolerance]);
-
+			translate([0, 0, -3*handR/4])
+			sphere(r = handR - wall);
+			translate([-handR, -handR + wall, -2*handR])
+				cube([handR*2 - wall, handR*2 - wall, handR*2 - wall]);
 		}
+
+		// Thumb extension
+		translate([-sin(thumbAngle)*(thumbDe) + wall, -sin(thumbAngle)*(thumbW - 2*wall), 0])
+			rotate([0, 0, thumbAngle])
+				cube([thumbW - 2*wall, thumbDe - wall, thumbH + dpadH/2 - wall]);
+
+		// Finger extensions
+		translate([wall, -fingerDe + pointerDe - wall, 0])
+			cube([keycapW + 2*keycapSpacing + tolerance, fingerDe, pointerH - wall]);
+
+		translate([keycapW + 2*keycapSpacing + tolerance, -fingerDe + middleDe - wall, 0])
+			cube([keycapW + 2*keycapSpacing, fingerDe, middleH - wall]);
+		translate([2*keycapW + 3*keycapSpacing, -fingerDe + ringDe - wall, 0])
+			cube([keycapW + 2*keycapSpacing, fingerDe, ringH - wall]);
+		translate([3*keycapW + 5*keycapSpacing - 0.005, -fingerDe/2 + pinkyDe - wall, -tolerance/2])
+			cube([keycapW + 2*keycapSpacing + tolerance +thickness - wall, fingerDe/2, pinkyH - wall]);
+
 	}
 
 	// Keycap cutouts
-	translate([keycapSpacing/2 - wall, pointerDe - 1.5*keycapSpacing - wall, fingerH - wall])
-		cube([keycapW + keycapSpacing + 0.001 + 2*wall, fingerDe, keycapH]);
-	translate([keycapW + 3/2*keycapSpacing - 0.001 - wall, middleDe - 1.5*keycapSpacing - wall, fingerH - wall])
-		cube([keycapW + keycapSpacing + 0.001 + 2*wall, fingerDe, keycapH]);
-	translate([2*keycapW + 5/2*keycapSpacing - 0.001 - wall, ringDe - 1.5*keycapSpacing - wall, fingerH - wall])
-		cube([keycapW + keycapSpacing + 0.001 + 2*wall, fingerDe, keycapH]);
-	translate([3*keycapW + 7/2*keycapSpacing - 0.001 - wall, pinkyDe - 1.5*keycapSpacing - wall, fingerH - wall])
-		cube([keycapW + keycapSpacing + 2*wall, fingerDe, keycapH]);
+	translate([-wall, pointerDe - keycapW - wall - keycapSpacing, pointerH - wall])
+		cube([keycapW + 2*keycapSpacing + 0.001 + 2*wall, fingerDe, handR]);
+	translate([keycapW + 2*keycapSpacing - 0.001 - wall, middleDe - keycapW - wall - keycapSpacing, middleH - wall])
+		cube([keycapW + 2*keycapSpacing + 0.001 + 2*wall, fingerDe, handR]);
+	translate([2*keycapW + 4*keycapSpacing - 0.001 - wall, ringDe - keycapW - wall - keycapSpacing, ringH - wall])
+		cube([keycapW + 2*keycapSpacing + 0.001 + 2*wall, fingerDe, handR]);
+	translate([3*keycapW + 6*keycapSpacing - 0.001 - wall, pinkyDe - keycapW - wall - keycapSpacing, pinkyH - wall])
+		cube([2*keycapW + 2*keycapSpacing + 2*wall, fingerDe, handR]);
 	}
 }
 
 module screws(height, diameter, cap) {
-		translate([fingerW/2 - screwStandoffD/2, -handR + screwStandoffD - 0.5, 0]) {
-			cylinder(h = height, d = diameter);
-			if (cap) {
-				translate([0, 0, height])
-				sphere(d = diameter);
-			}
+	translate([-screwStandoffD + 1, thumbDe - screwStandoffD + 2, 0]) {
+		cylinder(h = height, d = diameter);
+		if (cap) {
+			translate([0, 0, height])
+			sphere(d = diameter);
 		}
-		translate([screwStandoffD/2, pointerDe + keycapW - screwStandoffD + 2, 0]) {
-			cylinder(h = height, d = diameter);
-			if (cap) {
-				translate([0, 0, height])
-				sphere(d = diameter);
-			}
+	}
+	translate([fingerW - keycapW/2 - screwStandoffD/2, pinkyDe + screwStandoffD/2 - 1, 0]) {
+		cylinder(h = height, d = diameter);
+		if (cap) {
+			translate([0, 0, height])
+			sphere(d = diameter);
 		}
-		translate([2*thickness, -fingerW/4 - 0.8, 0]) {
-			cylinder(h = height, d = diameter);
-			if (cap) {
-				translate([0, 0, height])
-				sphere(d = diameter);
-			}
+	}
+	translate([2*thickness + 0.1, -fingerW/4 - 0.8, 0]) {
+		cylinder(h = height, d = diameter);
+		if (cap) {
+			translate([0, 0, height])
+			sphere(d = diameter);
 		}
-		translate([fingerW - screwStandoffD + 2, pinkyDe + keycapW - thickness - 2, 0]) {
-			cylinder(h = height, d = diameter);
-			if (cap) {
-				translate([0, 0, height])
-				sphere(d = diameter);
-			}
+	}
+	translate([fingerW - (screwStandoffD+2)/2 + 1, -fingerW/4 - 0.8, 0]) {
+		cylinder(h = height, d = diameter);
+		if (cap) {
+			translate([0, 0, height])
+			sphere(d = diameter);
 		}
+	}
 }
 
 module lid() {
-	battery();
-	chargingReceiver();
-	proMicro();
+	//battery();
+	//chargingReceiver();
+	//proMicro();
 
 	translate([0, 0, -lidDistance])
 	color(keyboardColor) {
@@ -333,11 +339,11 @@ module lid() {
 			scale([1, 1, lidH*10])
 			intersection() {
 				case(0);
-				translate([-thumbDe, -handR, -handR + 0.1])
-					cube([thumbDe + fingerW, fingerDe + handR, handR]);
+				translate([-thumbDe, -2*handR, 0])
+					cube([thumbDe + 2*fingerW, fingerDe + 2*handR, 0.1]);
 			}
-			translate([0, 0, -(lidH + 0.01)])
-				screws(screwStandoffH, screwD, false);
+			translate([0, 0, -0.01])
+				screws(lidH + 0.1, screwD, false);
 			translate([0, 0, -0.01])
 				screws(counterSinkH, screwHeadD, false);
 
@@ -345,16 +351,20 @@ module lid() {
 			sideChannels(innerScale=0.98, height=sideChannelH);
 
 			quickReleaseChannel();
+
+			// Qi Charger cutout
+			translate([fingerW/2 - chargerW/2, pinkyH - pcbH - switchToPcb - 2*thickness - chargerW/3, lidH - chargerH + 0.1])
+				cube([chargerW, chargerDe, chargerH + 0.2]);
+			translate([fingerW/2, pinkyH - pcbH - switchToPcb - 2*thickness, lidH - chargerH + 0.1])
+				cube([handR - thickness, 5, chargerH + 0.2]);
 		}
 		// ProMicro standoff
-		translate([fingerW/2 - proMicroStandoffW/2, -(proMicroStandoffDe + (batteryStandoffDe - batteryDe)/2), lidH])
+		translate([fingerW/2 - proMicroStandoffW/2, pinkyH - pcbH - switchToPcb - 2*thickness - batteryStandoffDe/2 - proMicroStandoffDe, lidH])
 			proMicroStandoff();
 
 		// Battery Standoff
-		translate([fingerW/2 - batteryStandoffW/2, -(batteryStandoffDe - batteryDe)/2, lidH])
+		translate([fingerW/2 - batteryStandoffW/2, pinkyH - pcbH - switchToPcb - 2*thickness - batteryStandoffDe/2, lidH])
 			batteryStandoff();
-
-		// Quickrelease channel
 	}
 }
 
@@ -364,20 +374,20 @@ module sideChannels(innerScale, height) {
 		scale([channelScale, channelScale, 1]) {
 			intersection() {
 				case(0);
-				translate([-thumbDe, -handR, -handR + height])
-					cube([thumbDe + fingerW, fingerDe + handR, handR]);
+				translate([-thumbW, -7*handR/4, -handR + height])
+					cube([thumbDe + fingerW, middleDe + 7*handR/4, handR]);
 			}
 		}
 		translate([fingerW*((1-innerScale)/2) - fingerW*((1-channelScale)/2) , 0, -0.01])
-		scale([innerScale, innerScale, 1.01]) {
+		scale([innerScale, innerScale, 100*height]) {
 			intersection() {
 				case(0);
-				translate([-thumbDe, -handR, -handR + height])
-					cube([thumbDe + fingerW, fingerDe + handR, handR]);
+				translate([-thumbW, -7*handR/4, 0])
+					cube([thumbDe + fingerW, middleDe + 7*handR/4, 0.01]);
 			}
 		}
-		translate([-fingerW/2, pinkyDe, -0.01])
-			cube([fingerW*2, fingerDe, lidH*channelScale]);
+		translate([-fingerW/2, middleDe, -0.01])
+			cube([fingerW*2, fingerDe + 7*handR/4, lidH*channelScale]);
 	}
 }
 
@@ -391,14 +401,10 @@ module quickReleaseChannel() {
 	rotate([0, 0, -asin((2*quickReleaseArmDi)/lidQuickReleaseChannelDe)])
 		cube([quickReleaseArmDi, lidQuickReleaseChannelDe, sideChannelH]);
 
-	translate([baseScale*fingerW - quickReleaseButtonWall - 2*quickReleaseArmDi - quickReleaseButtonH - quickReleaseArmDi/2 - tolerance, -((fingerDe + handR)*baseScale - (fingerDe + handR))/4 - quickReleaseArmDi/2, -lidH*0.01])
-	mirror([0, 1, 0])
-	rotate([0, 0, -asin((2*quickReleaseArmDi)/lidQuickReleaseChannelDe)/2])
-		cube([quickReleaseArmDi, lidQuickReleaseChannelDe, sideChannelH]);
-
-	translate([baseScale*fingerW - quickReleaseButtonWall - 2*quickReleaseArmDi - quickReleaseButtonH - quickReleaseArmDi/2 - tolerance, -((fingerDe + handR)*baseScale - (fingerDe + handR))/4 - quickReleaseArmDi/2, -lidH*0.01])
-	mirror([0, 1, 0])
-		cube([quickReleaseArmDi, lidQuickReleaseChannelDe, sideChannelH]);
+//	translate([baseScale*fingerW - quickReleaseButtonWall - 2*quickReleaseArmDi - quickReleaseButtonH - quickReleaseArmDi/2 - tolerance, -((fingerDe + handR)*baseScale - (fingerDe + handR))/4 - quickReleaseArmDi/2, -lidH*0.01])
+//	mirror([0, 1, 0])
+//	rotate([0, 0, -asin((2*quickReleaseArmDi)/lidQuickReleaseChannelDe)/2])
+//		cube([quickReleaseArmDi, lidQuickReleaseChannelDe, sideChannelH]);
 }
 
 module base() {
@@ -439,9 +445,7 @@ module base() {
 
 module keyboard() {
 	color(keyboardColor) {
-		// Hollow out screw standoffs
 		difference() {
-			// Add screw standoffs
 			union() {
 				// Hollowed out case with switch cutouts
 				difference() {
@@ -450,13 +454,45 @@ module keyboard() {
 					switchCutouts();
 				}
 
-				// Screw standoffs
-				screws(screwStandoffH, screwStandoffD + 2, true);
-
+				// PCB holder
+				intersection() {
+					translate([-thumbDe, pinkyDe - keycapW - thickness - keycapSpacing, pinkyH - pcbH - switchToPcb - 2*thickness])
+						cube([4*handR, fingerDe, handR]);
+					difference() {
+						case();
+						switchCutouts();
+					}
+				}
 			}
 
+			union() {
+				// PCB rails
+				translate([keycapSpacing + keycapW/2 - pcbW/2, pointerDe - 2*keycapW - tolerance + 0.0005 - thickness, pointerH - pcbH - switchToPcb - thickness + 0.001])
+					cube([pcbW, 2*keycapW + tolerance, pcbH]);
+				translate([keycapW + 3*keycapSpacing + keycapW/2 - pcbW/2, middleDe - 2*keycapW - tolerance + 0.005 - 2*thickness, middleH - pcbH - switchToPcb - thickness + 0.001])
+					cube([pcbW, 2*keycapW + tolerance + thickness, pcbH]);
+				translate([2*keycapW + 5*keycapSpacing + keycapW/2 - pcbW/2, ringDe - 2*keycapW - tolerance + 0.005 - thickness, ringH - pcbH - switchToPcb - thickness + 0.001])
+					cube([pcbW, 2*keycapW + tolerance, pcbH]);
+				translate([3*keycapW + 7*keycapSpacing + keycapW/2 - pcbW/2, pinkyDe - 2*keycapW - tolerance + 0.005 - thickness, pinkyH - pcbH - switchToPcb - thickness + 0.001])
+					cube([pcbW, 2*keycapW + tolerance, pcbH]);
+
+				// PCB bottom hole
+				translate([keycapSpacing + keycapW/2 - pcbW/2 + thickness/2, 0.0005 - thickness, -thickness])
+					cube([pcbW - thickness, pointerDe, pointerH]);
+				translate([keycapW + 3*keycapSpacing + keycapW/2 - pcbW/2 + thickness/2, 0.005 - thickness, -thickness])
+					cube([pcbW - thickness, middleDe, middleH]);
+				translate([2*keycapW + 5*keycapSpacing + keycapW/2 - pcbW/2 + thickness/2, 0.005 - thickness, -thickness])
+					cube([pcbW - thickness, ringDe, ringH]);
+				translate([3*keycapW + 7*keycapSpacing + keycapW/2 - pcbW/2 + thickness/2, 0.005 - thickness, -thickness])
+					cube([pcbW - thickness, pinkyDe, pinkyH]);
+			}
+		}
+		difference() {
+			// Screw standoffs
+			screws(screwStandoffH, screwStandoffD + 2, true);
+
 			translate([0, 0, -2])
-			screws(screwStandoffH, screwStandoffD, false);
+				screws(screwStandoffH, screwStandoffD, false);
 		}
 	}
 }
@@ -477,9 +513,9 @@ module quickRelease() {
 	}
 }
 
-keyboard();
+//keyboard();
 //keycaps();
-//lid();
+lid();
 //base();
 //quickRelease();
 
